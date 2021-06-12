@@ -16,7 +16,7 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           images: |
-            osskit/dakfa-producer
+            ${{github.repository}}
           tags: |
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
