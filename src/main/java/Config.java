@@ -58,8 +58,8 @@ class Config {
         }
 
         if (SECURITY_PROTOCOL.equals("SASL_SSL")) {
-            SASL_USERNAME = getString(dotenv, "SASL_USERNAME");
-            SASL_PASSWORD = readFile(getString(dotenv, "SASL_PASSWORD_FILE_PATH"));
+            SASL_USERNAME = getStringValueOrFromFile(dotenv, "SASL_USERNAME");
+            SASL_PASSWORD = getStringValueOrFromFile(dotenv, "SASL_PASSWORD"));
             AUTHENTICATED_KAFKA = true;
         }
 
@@ -83,6 +83,22 @@ class Config {
         }
 
         return value;
+    }
+
+    private static String getStringValueOrFromFile(Dotenv dotenv, String name) throws Exception {
+        String value = dotenv.get(name);
+
+        if (value != null) {
+            return value;
+        }
+
+        String filePath = dotenv.get(name + "_FILE_PATH");
+
+        if (filePath == null) {
+            throw new Exception("missing env var: " + name + " or " + name + "_FILE_PATH");
+        }
+
+        return readFile(filePath);
     }
 
     private static String getOptionalString(Dotenv dotenv, String name, String fallback) {
