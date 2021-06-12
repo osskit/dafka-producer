@@ -3,10 +3,9 @@ name: "Bump Version"
 on:
   push:
     paths-ignore:
-      - '.github/**'
-      - 'README.md'
+      - ".github/**"
+      - "README.md"
     branches: [main]
-
 
 jobs:
   bump-version:
