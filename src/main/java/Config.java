@@ -59,7 +59,7 @@ class Config {
 
         if (SECURITY_PROTOCOL.equals("SASL_SSL")) {
             SASL_USERNAME = getStringValueOrFromFile(dotenv, "SASL_USERNAME");
-            SASL_PASSWORD = getStringValueOrFromFile(dotenv, "SASL_PASSWORD"));
+            SASL_PASSWORD = getStringValueOrFromFile(dotenv, "SASL_PASSWORD");
             AUTHENTICATED_KAFKA = true;
         }
 
