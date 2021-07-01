@@ -5,6 +5,7 @@ import java.util.Date;
 import org.json.JSONObject;
 
 public class Monitor {
+
     private static Counter produceSuccess;
     private static Counter produceError;
     private static Histogram produceLatency;

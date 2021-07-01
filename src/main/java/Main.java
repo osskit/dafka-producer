@@ -1,4 +1,5 @@
 public class Main {
+
     static Config config;
     static Monitor monitor;
     static Producer producer;

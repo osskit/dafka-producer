@@ -6,8 +6,8 @@ import com.sun.net.httpserver.HttpServer;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
-import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.util.Iterator;
 import java.util.stream.Collectors;
@@ -18,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Server {
+
     Config config;
     Monitor monitor;
     HttpServer server;
@@ -50,7 +51,6 @@ public class Server {
         var httpContext = server.createContext("/isAlive");
         httpContext.setHandler(
             new HttpHandler() {
-
                 @Override
                 public void handle(HttpExchange exchange) throws IOException {
                     if (!exchange.getRequestMethod().equals("GET")) {
@@ -71,7 +71,6 @@ public class Server {
         var httpContext = server.createContext("/produce");
         httpContext.setHandler(
             new HttpHandler() {
-
                 @Override
                 public void handle(HttpExchange exchange) throws IOException {
                     if (!exchange.getRequestMethod().equals("POST")) {

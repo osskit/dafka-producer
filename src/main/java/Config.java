@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.Base64;
 
 class Config {
+
     //Required
     public static int PORT;
     public static String KAFKA_BROKER;
