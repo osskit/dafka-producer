@@ -16,16 +16,12 @@ class Config {
     public static int LINGER_TIME_MS;
     public static String COMPRESSION_TYPE;
 
-    //Autentication
-    public static boolean AUTHENTICATED_KAFKA = false;
-    public static String SECURITY_PROTOCOL;
-    public static String TRUSTSTORE_LOCATION;
-    public static String KEYSTORE_LOCATION;
-    public static String TRUSTSTORE_PASSWORD;
-    public static String KEYSTORE_PASSWORD;
-    public static String KEY_PASSWORD;
+    //Authentication
+    public static boolean USE_SASL_AUTH;
     public static String SASL_USERNAME;
     public static String SASL_PASSWORD;
+    public static String TRUSTSTORE_FILE_PATH;
+    public static String TRUSTSTORE_PASSWORD;
 
     //Monitoring
     public static boolean USE_PROMETHEUS;
@@ -41,39 +37,18 @@ class Config {
         LINGER_TIME_MS = getOptionalInt(dotenv, "LINGER_TIME_MS", 0);
         COMPRESSION_TYPE = getOptionalString(dotenv, "COMPRESSION_TYPE", "none");
 
-        String truststoreFilePath = getOptionalString(dotenv, "TRUSTSTORE_FILE_PATH", null);
-        if (truststoreFilePath != null) {
-            TRUSTSTORE_LOCATION = "client.truststore.jks";
-            writeToFile(TRUSTSTORE_LOCATION, readFile(getString(dotenv, "TRUSTSTORE_FILE_PATH")));
-            TRUSTSTORE_PASSWORD = readFile(getString(dotenv, "TRUSTSTORE_PASSWORD_FILE_PATH"));
-        }
-
-        SECURITY_PROTOCOL = getOptionalString(dotenv, "SECURITY_PROTOCOL", "");
-
-        if (SECURITY_PROTOCOL.equals("SSL")) {
-            KEYSTORE_LOCATION = "client.keystore.p12";
-            KEYSTORE_PASSWORD = readFile(getString(dotenv, "KEYSTORE_PASSWORD_FILE_PATH"));
-            writeToFile(KEYSTORE_LOCATION, readFile(getString(dotenv, "KEYSTORE_FILE_PATH")));
-            KEY_PASSWORD = readFile(getString(dotenv, "KEY_PASSWORD_FILE_PATH"));
-            AUTHENTICATED_KAFKA = true;
-        }
-
-        if (SECURITY_PROTOCOL.equals("SASL_SSL")) {
-            SASL_USERNAME = getStringValueOrFromFile(dotenv, "SASL_USERNAME");
+        USE_SASL_AUTH = getOptionalBool(dotenv, "USE_SASL_AUTH", false);
+        if (USE_SASL_AUTH) {
+            SASL_USERNAME = getString(dotenv, "SASL_USERNAME");
             SASL_PASSWORD = getStringValueOrFromFile(dotenv, "SASL_PASSWORD");
-            AUTHENTICATED_KAFKA = true;
+            TRUSTSTORE_FILE_PATH = getOptionalString(dotenv, "TRUSTSTORE_FILE_PATH", null);
+            if (TRUSTSTORE_FILE_PATH != null) {
+                TRUSTSTORE_PASSWORD = getStringValueOrFromFile(dotenv, "TRUSTSTORE_PASSWORD");
+            }
         }
 
         USE_PROMETHEUS = getOptionalBool(dotenv, "USE_PROMETHEUS", false);
         PROMETHEUS_BUCKETS = getOptionalString(dotenv, PROMETHEUS_BUCKETS, "0.003,0.03,0.1,0.3,1.5,10");
-    }
-
-    private static void writeToFile(String path, String value) throws IOException {
-        Files.write(Paths.get(path), Base64.getDecoder().decode(value.getBytes(StandardCharsets.UTF_8)));
-    }
-
-    private static String readFile(String path) throws IOException {
-        return new String(Files.readAllBytes(Paths.get(path)));
     }
 
     private static String getString(Dotenv dotenv, String name) throws Exception {
@@ -99,7 +74,7 @@ class Config {
             throw new Exception("missing env var: " + name + " or " + name + "_FILE_PATH");
         }
 
-        return readFile(filePath);
+        return new String(Files.readAllBytes(Paths.get(filePath)));
     }
 
     private static String getOptionalString(Dotenv dotenv, String name, String fallback) {
