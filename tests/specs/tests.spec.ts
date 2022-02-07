@@ -37,7 +37,7 @@ describe('tests', () => {
                 topic: 'foo',
                 key: 'thekey',
                 value: {data: 'foo'},
-                headers: {eventType: 'test1', source: 'test-service1'},
+                headers: {eventType: 'test1', source: 'test-service1', 'x-correlation-id': 'correlationId'},
             },
         ]);
         await delay(1000);
@@ -46,7 +46,7 @@ describe('tests', () => {
                 topic: 'bar',
                 key: 'thekey',
                 value: {data: 'bar'},
-                headers: {eventType: 'test2', source: 'test-service2'},
+                headers: {eventType: 'test2', source: 'test-service2', 'x-correlation-id': 'correlationId'},
             },
         ]);
         await delay(1000);
@@ -62,6 +62,8 @@ describe('tests', () => {
         expect(madeCalls[1].headers['x-record-topic']).toBe('bar');
         expect(actualHeaders2!.eventType).toEqual('test2');
         expect(actualHeaders2!.source).toEqual('test-service2');
+        expect(actualHeaders1!['x-correlation-id']).toBe('correlationId');
+        expect(actualHeaders2!['x-correlation-id']).toBe('correlationId');
     });
 
     it('producer request validation', async () => {
@@ -72,7 +74,7 @@ describe('tests', () => {
 
         response = await fetch(producerUrl, {
             method,
-            body: JSON.stringify([{key: 'key', value: {data: 1}}]),
+            body: JSON.stringify([{key: 'key', value: {data: 1}, headers: {'x-correlation-id': 'correlationId'}}]),
             headers,
         });
         expect(response.status).toBe(400);
@@ -80,7 +82,7 @@ describe('tests', () => {
 
         response = await fetch(producerUrl, {
             method,
-            body: JSON.stringify([{topic: 'bar', value: {data: 1}}]),
+            body: JSON.stringify([{topic: 'bar', value: {data: 1}, headers: {'x-correlation-id': 'correlationId'}}]),
             headers,
         });
         expect(response.status).toBe(400);
@@ -88,11 +90,19 @@ describe('tests', () => {
 
         response = await fetch(producerUrl, {
             method,
-            body: JSON.stringify([{topic: 'bar', key: 'key'}]),
+            body: JSON.stringify([{topic: 'bar', key: 'key', headers: {'x-correlation-id': 'correlationId'}}]),
             headers,
         });
         expect(response.status).toBe(400);
         expect(await response.text()).toBe('value is missing');
+
+        response = await fetch(producerUrl, {
+            method,
+            body: JSON.stringify([{topic: 'bar', key: 'key', value: {data: 1}}]),
+        });
+
+        expect(response.status).toBe(400);
+        expect(await response.text()).toBe('correlationId is missing');
     });
 });
 

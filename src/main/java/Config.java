@@ -1,9 +1,6 @@
 import io.github.cdimascio.dotenv.Dotenv;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Base64;
 
 class Config {
 
@@ -22,6 +19,10 @@ class Config {
     public static String SASL_PASSWORD;
     public static String TRUSTSTORE_FILE_PATH;
     public static String TRUSTSTORE_PASSWORD;
+
+    // Correlation
+    public static boolean ENFORCE_CORRELATION_ID;
+    public static String CORRELATION_ID_HEADER_KEY;
 
     //Monitoring
     public static boolean USE_PROMETHEUS;
@@ -46,6 +47,9 @@ class Config {
                 TRUSTSTORE_PASSWORD = getStringValueOrFromFile(dotenv, "TRUSTSTORE_PASSWORD");
             }
         }
+
+        ENFORCE_CORRELATION_ID = getOptionalBool(dotenv, "ENFORCE_CORRELATION_ID", false);
+        CORRELATION_ID_HEADER_KEY = getOptionalString(dotenv, "CORRELATION_ID_HEADER_KEY", "x-correlation-id");
 
         USE_PROMETHEUS = getOptionalBool(dotenv, "USE_PROMETHEUS", false);
         PROMETHEUS_BUCKETS = getOptionalString(dotenv, PROMETHEUS_BUCKETS, "0.003,0.03,0.1,0.3,1.5,10");
