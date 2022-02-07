@@ -86,6 +86,9 @@ public class Server {
                             .map(
                                 jsonItem -> {
                                     var item = new JSONObject(jsonItem.toString());
+
+                                    validateCorrelationIdHeader(tryGetHeaders(item));
+
                                     return new ProducerRequest(
                                         tryGetValue(item, "topic", null),
                                         tryGetValue(item, "key", null),
@@ -111,6 +114,22 @@ public class Server {
                 }
             }
         );
+    }
+
+    public void validateCorrelationIdHeader(Iterable<Header> headers) {
+        if (!Config.ENFORCE_CORRELATION_ID) {
+            return;
+        }
+
+        if (headers != null) {
+            for (Header header : headers) {
+                if (header.key().equals(Config.CORRELATION_ID_HEADER_KEY)) {
+                    return;
+                }
+            }
+        }
+
+        throw new IllegalArgumentException("correlationId is missing");
     }
 
     private Iterable<Header> tryGetHeaders(JSONObject item) {
