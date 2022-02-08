@@ -1,9 +1,9 @@
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.Headers;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
@@ -78,8 +78,6 @@ public class Server {
                     }
 
                     try {
-                        validateCorrelationIdHeader(exchange);
-
                         var body = CharStreams.toString(
                             new InputStreamReader(exchange.getRequestBody(), Charsets.UTF_8)
                         );
@@ -115,19 +113,6 @@ public class Server {
         );
     }
 
-    public String validateCorrelationIdHeader(HttpExchange exchange) {
-        if (!Config.ENFORCE_CORRELATION_ID) {
-            return null;
-        }
-
-        var correlationId = exchange.getRequestHeaders().getFirst(Config.CORRELATION_ID_HEADER_KEY);
-        if (correlationId == null) {
-            throw new IllegalArgumentException("correlationId is missing");
-        }
-
-        return correlationId;
-    }
-
     private static String tryGetValue(JSONObject json, String key) {
         if (json.has(key)) {
             return json.get(key).toString();
@@ -137,8 +122,7 @@ public class Server {
 
     private RecordHeaders createRecordHeaders(Headers headers) {
         var recordHeaders = new RecordHeaders();
-        headers.forEach(
-            (key, value) -> recordHeaders.add(key, value.get(0).getBytes()));
+        headers.forEach((key, value) -> recordHeaders.add(key, value.get(0).getBytes()));
         return recordHeaders;
     }
 }
