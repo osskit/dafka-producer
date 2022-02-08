@@ -3,17 +3,15 @@ import com.google.common.io.CharStreams;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.Headers;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
-import java.util.Iterator;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import org.apache.kafka.common.header.Header;
-import org.apache.kafka.common.header.internals.RecordHeader;
 import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -80,7 +78,7 @@ public class Server {
                     }
 
                     try {
-                        var correlationId = validateCorrelationIdHeader(exchange);
+                        validateCorrelationIdHeader(exchange);
 
                         var body = CharStreams.toString(
                             new InputStreamReader(exchange.getRequestBody(), Charsets.UTF_8)
@@ -94,14 +92,7 @@ public class Server {
                                         tryGetValue(item, "topic"),
                                         tryGetValue(item, "key"),
                                         tryGetValue(item, "value"),
-                                        new RecordHeaders(
-                                            new RecordHeader[] {
-                                                new RecordHeader(
-                                                    Config.CORRELATION_ID_HEADER_KEY,
-                                                    correlationId.getBytes()
-                                                ),
-                                            }
-                                        )
+                                        createRecordHeaders(exchange.getRequestHeaders())
                                     );
                                 }
                             )
@@ -129,7 +120,7 @@ public class Server {
             return null;
         }
 
-        var correlationId = exchange.getRequestHeaders().getFirst("x-correlation-id");
+        var correlationId = exchange.getRequestHeaders().getFirst(Config.CORRELATION_ID_HEADER_KEY);
         if (correlationId == null) {
             throw new IllegalArgumentException("correlationId is missing");
         }
@@ -142,5 +133,12 @@ public class Server {
             return json.get(key).toString();
         }
         throw new IllegalArgumentException(key + " is missing");
+    }
+
+    private RecordHeaders createRecordHeaders(Headers headers) {
+        var recordHeaders = new RecordHeaders();
+        headers.forEach(
+            (key, value) -> recordHeaders.add(key, value.get(0).getBytes()));
+        return recordHeaders;
     }
 }
