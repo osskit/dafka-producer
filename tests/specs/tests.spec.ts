@@ -37,7 +37,6 @@ describe('tests', () => {
                 topic: 'foo',
                 key: 'thekey',
                 value: {data: 'foo'},
-                headers: {eventType: 'test1', source: 'test-service1', 'x-correlation-id': 'correlationId'},
             },
         ]);
         await delay(1000);
@@ -46,7 +45,6 @@ describe('tests', () => {
                 topic: 'bar',
                 key: 'thekey',
                 value: {data: 'bar'},
-                headers: {eventType: 'test2', source: 'test-service2', 'x-correlation-id': 'correlationId'},
             },
         ]);
         await delay(1000);
@@ -57,11 +55,7 @@ describe('tests', () => {
         const actualHeaders1 = JSON.parse(madeCalls[0].headers['x-record-headers']);
         const actualHeaders2 = JSON.parse(madeCalls[1].headers['x-record-headers']);
         expect(madeCalls[0].headers['x-record-topic']).toBe('foo');
-        expect(actualHeaders1!.eventType).toEqual('test1');
-        expect(actualHeaders1!.source).toEqual('test-service1');
         expect(madeCalls[1].headers['x-record-topic']).toBe('bar');
-        expect(actualHeaders2!.eventType).toEqual('test2');
-        expect(actualHeaders2!.source).toEqual('test-service2');
         expect(actualHeaders1!['x-correlation-id']).toBe('correlationId');
         expect(actualHeaders2!['x-correlation-id']).toBe('correlationId');
     });
@@ -69,12 +63,12 @@ describe('tests', () => {
     it('producer request validation', async () => {
         const method = 'post';
         const producerUrl = 'http://localhost:6000/produce';
-        const headers = {'Content-Type': 'application/json'};
+        const headers = {'Content-Type': 'application/json', 'x-correlation-id': 'correlationId'};
         let response;
 
         response = await fetch(producerUrl, {
             method,
-            body: JSON.stringify([{key: 'key', value: {data: 1}, headers: {'x-correlation-id': 'correlationId'}}]),
+            body: JSON.stringify([{key: 'key', value: {data: 1}}]),
             headers,
         });
         expect(response.status).toBe(400);
@@ -82,7 +76,7 @@ describe('tests', () => {
 
         response = await fetch(producerUrl, {
             method,
-            body: JSON.stringify([{topic: 'bar', value: {data: 1}, headers: {'x-correlation-id': 'correlationId'}}]),
+            body: JSON.stringify([{topic: 'bar', value: {data: 1}}]),
             headers,
         });
         expect(response.status).toBe(400);
@@ -90,7 +84,7 @@ describe('tests', () => {
 
         response = await fetch(producerUrl, {
             method,
-            body: JSON.stringify([{topic: 'bar', key: 'key', headers: {'x-correlation-id': 'correlationId'}}]),
+            body: JSON.stringify([{topic: 'bar', key: 'key'}]),
             headers,
         });
         expect(response.status).toBe(400);
@@ -110,7 +104,7 @@ const produce = (url: string, batch: any[]) =>
     fetch(url, {
         method: 'post',
         body: JSON.stringify(batch),
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json', 'x-correlation-id': 'correlationId'},
     });
 
 const mockHttpTarget = (route: string, statusCode: number) =>
