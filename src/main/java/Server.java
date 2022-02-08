@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.internals.RecordHeader;
 import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -77,7 +78,10 @@ public class Server {
                         exchange.sendResponseHeaders(404, -1);
                         return;
                     }
+
                     try {
+                        var correlationId = validateCorrelationIdHeader(exchange);
+
                         var body = CharStreams.toString(
                             new InputStreamReader(exchange.getRequestBody(), Charsets.UTF_8)
                         );
@@ -86,14 +90,18 @@ public class Server {
                             .map(
                                 jsonItem -> {
                                     var item = new JSONObject(jsonItem.toString());
-
-                                    validateCorrelationIdHeader(tryGetHeaders(item));
-
                                     return new ProducerRequest(
-                                        tryGetValue(item, "topic", null),
-                                        tryGetValue(item, "key", null),
-                                        tryGetValue(item, "message", "value"),
-                                        tryGetHeaders(item)
+                                        tryGetValue(item, "topic"),
+                                        tryGetValue(item, "key"),
+                                        tryGetValue(item, "value"),
+                                        new RecordHeaders(
+                                            new RecordHeader[] {
+                                                new RecordHeader(
+                                                    Config.CORRELATION_ID_HEADER_KEY,
+                                                    correlationId.getBytes()
+                                                ),
+                                            }
+                                        )
                                     );
                                 }
                             )
@@ -116,49 +124,23 @@ public class Server {
         );
     }
 
-    public void validateCorrelationIdHeader(Iterable<Header> headers) {
+    public String validateCorrelationIdHeader(HttpExchange exchange) {
         if (!Config.ENFORCE_CORRELATION_ID) {
-            return;
+            return null;
         }
 
-        if (headers != null) {
-            for (Header header : headers) {
-                if (header.key().equals(Config.CORRELATION_ID_HEADER_KEY)) {
-                    return;
-                }
-            }
+        var correlationId = exchange.getRequestHeaders().getFirst("x-correlation-id");
+        if (correlationId == null) {
+            throw new IllegalArgumentException("correlationId is missing");
         }
 
-        throw new IllegalArgumentException("correlationId is missing");
+        return correlationId;
     }
 
-    private Iterable<Header> tryGetHeaders(JSONObject item) {
-        if (item.has("headers")) {
-            JSONObject headersJson = item.getJSONObject("headers");
-            Iterator<String> keys = headersJson.keys();
-            if (keys.hasNext()) {
-                RecordHeaders headers = new RecordHeaders();
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    headers.add(key, headersJson.getString(key).getBytes());
-                }
-                return headers;
-            }
+    private static String tryGetValue(JSONObject json, String key) {
+        if (json.has(key)) {
+            return json.get(key).toString();
         }
-        return null;
-    }
-
-    private static String tryGetValue(JSONObject json, String option1, String option2) {
-        if (json.has(option1)) {
-            return json.get(option1).toString();
-        }
-        if (json.has(option2)) {
-            return json.get(option2).toString();
-        }
-
-        if (option2 == null) {
-            throw new IllegalArgumentException(option1 + " is missing");
-        }
-        throw new IllegalArgumentException(option2 + " is missing");
+        throw new IllegalArgumentException(key + " is missing");
     }
 }
