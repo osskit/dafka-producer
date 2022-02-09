@@ -1,9 +1,9 @@
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.Headers;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
@@ -138,7 +138,12 @@ public class Server {
     private RecordHeaders createRecordHeaders(Headers headers) {
         var recordHeaders = new RecordHeaders();
         headers.forEach(
-            (key, value) -> recordHeaders.add(key, value.get(0).getBytes()));
+            (key, value) -> {
+                if (key.startsWith(Config.HEADERS_PREFIX)) {
+                    recordHeaders.add(key, value.get(0).getBytes());
+                }
+            }
+        );
         return recordHeaders;
     }
 }
