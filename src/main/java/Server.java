@@ -92,7 +92,7 @@ public class Server {
                                         tryGetValue(item, "topic"),
                                         tryGetValue(item, "key"),
                                         tryGetValue(item, "value"),
-                                        createRecordHeaders(exchange.getRequestHeaders())
+                                        tracingHeaders(exchange.getRequestHeaders())
                                     );
                                 }
                             )
@@ -135,15 +135,41 @@ public class Server {
         throw new IllegalArgumentException(key + " is missing");
     }
 
-    private RecordHeaders createRecordHeaders(Headers headers) {
+    private RecordHeaders tracingHeaders(Headers headers) {
         var recordHeaders = new RecordHeaders();
-        headers.forEach(
-            (key, value) -> {
-                if (key.toLowerCase().startsWith(Config.HEADERS_PREFIX)) {
-                    recordHeaders.add(key, value.get(0).getBytes());
-                }
+
+        var traceId = headers.getFirst("x-b3-traceid");
+        if (traceId != null) {
+            recordHeaders.add("x-b3-traceid", traceId.getBytes());
+        }
+        var spanId = headers.getFirst("x-b3-spanid");
+        if (spanId != null) {
+            recordHeaders.add("x-b3-spanid", spanId.getBytes());
+        }
+        var parentSpanId = headers.getFirst("x-b3-parentspanid");
+        if (parentSpanId != null) {
+            recordHeaders.add("x-b3-parentspanid", parentSpanId.getBytes());
+        }
+        var sampled = headers.getFirst("x-b3-sampled");
+        if (sampled != null) {
+            recordHeaders.add("x-b3-sampled", sampled.getBytes());
+        }
+        var flags = headers.getFirst("x-b3-flags");
+        if (flags != null) {
+            recordHeaders.add("x-b3-flags", flags.getBytes());
+        }
+        var spanContext = headers.getFirst("x-ot-span-context");
+        if (spanContext != null) {
+            recordHeaders.add("x-ot-span-context", spanContext.getBytes());
+        }
+
+        if (Config.ENFORCE_CORRELATION_ID) {
+            var correlationId = headers.getFirst(Config.CORRELATION_ID_HEADER_KEY);
+            if (correlationId != null) {
+                recordHeaders.add(Config.CORRELATION_ID_HEADER_KEY, correlationId.getBytes());
             }
-        );
+        }
+
         return recordHeaders;
     }
 }
