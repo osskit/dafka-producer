@@ -138,6 +138,10 @@ public class Server {
     private RecordHeaders tracingHeaders(Headers headers) {
         var recordHeaders = new RecordHeaders();
 
+        var requestId = headers.getFirst("x-request-id");
+        if (requestId != null) {
+            recordHeaders.add("x-request-id", requestId.getBytes());
+        }
         var traceId = headers.getFirst("x-b3-traceid");
         if (traceId != null) {
             recordHeaders.add("x-b3-traceid", traceId.getBytes());
