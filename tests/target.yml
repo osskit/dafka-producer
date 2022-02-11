@@ -2,6 +2,7 @@ version: '2.3'
 
 services:
     target:
-        image: soluto/simple-fake-server
+        image: rodolpheche/wiremock
         ports:
-            - 3000:3000
+        - 8080:8080
+        command: '--verbose'

@@ -1,70 +1,81 @@
 import delay from 'delay';
 import fetch from 'node-fetch';
-import Server from 'simple-fake-server-server-client';
+import {WireMockRestClient} from 'wiremock-rest-client';
+import {StubMapping} from 'wiremock-rest-client/dist/model/stub-mapping.model';
 
 import checkReadiness from '../checkReadiness';
 
 jest.setTimeout(180000);
 
-const fakeHttpServer = new Server({
-    baseUrl: `http://localhost`,
-    port: 3000,
+const wireMock = new WireMockRestClient('http://localhost:8080', {
+    logLevel: 'error',
+    continueOnFailure: true,
 });
 
 describe('tests', () => {
     beforeAll(async () => {
-        // delay(120000);
         await expect(checkReadiness(['foo', 'bar', 'retry', 'dead-letter', 'unexpected'])).resolves.toBeTruthy();
     });
 
     afterEach(async () => {
-        await fakeHttpServer.clear();
+        await wireMock.global.resetAll();
     });
 
     it('liveliness', async () => {
-        await delay(1000);
-        const producer = await fetch('http://localhost:6000/isAlive');
-        const consumer = await fetch('http://localhost:4001/isAlive');
+        const producer = await fetch('http://localhost:6000/healthcheck');
+        const consumer = await fetch('http://localhost:4001/healthcheck');
+
         expect(producer.ok).toBeTruthy();
         expect(consumer.ok).toBeTruthy();
     });
 
-    it('should produce and consume', async () => {
-        const callId = await mockHttpTarget('/consume', 200);
+    it('produce and consume', async () => {
+        const target = await mockHttpTarget();
 
         await produce('http://localhost:6000/produce', [
             {
                 topic: 'foo',
                 key: 'thekey',
                 value: {data: 'foo'},
-                headers: {eventType: 'test1', source: 'test-service1'},
-            },
-        ]);
-        await delay(1000);
-        await produce('http://localhost:6000/produce', [
-            {
-                topic: 'bar',
-                key: 'thekey',
-                value: {data: 'bar'},
-                headers: {eventType: 'test2', source: 'test-service2'},
             },
         ]);
         await delay(1000);
 
-        const {hasBeenMade, madeCalls} = await fakeHttpServer.getCall(callId);
-        expect(hasBeenMade).toBeTruthy();
-        expect(madeCalls.length).toBe(2);
-        const actualHeaders1 = JSON.parse(madeCalls[0].headers['x-record-headers']);
-        const actualHeaders2 = JSON.parse(madeCalls[1].headers['x-record-headers']);
-        expect(madeCalls[0].headers['x-record-topic']).toBe('foo');
-        expect(actualHeaders1!.eventType).toEqual('test1');
-        expect(actualHeaders1!.source).toEqual('test-service1');
-        expect(madeCalls[1].headers['x-record-topic']).toBe('bar');
-        expect(actualHeaders2!.eventType).toEqual('test2');
-        expect(actualHeaders2!.source).toEqual('test-service2');
+        expect(await getCall(target)).toMatchSnapshot({
+            headers: {'x-record-timestamp': expect.any(String), 'x-record-offset': expect.any(String)},
+        });
     });
 
-    it('producer request validation', async () => {
+    it('produce with headers', async () => {
+        const target = await mockHttpTarget();
+
+        await produce(
+            'http://localhost:6000/produce',
+            [
+                {
+                    topic: 'foo',
+                    key: 'thekey',
+                    value: {data: 'foo'},
+                },
+            ],
+            {
+                'x-request-id': '123',
+                'x-b3-traceid': '456',
+                'x-b3-spanid': '789',
+                'x-b3-parentspanid': '101112',
+                'x-b3-sampled': '1',
+                'x-b3-flags': '1',
+                'x-ot-span-context': 'foo',
+            }
+        );
+        await delay(1000);
+
+        expect(await getCall(target)).toMatchSnapshot({
+            headers: {'x-record-timestamp': expect.any(String), 'x-record-offset': expect.any(String)},
+        });
+    });
+
+    it('validate request', async () => {
         const method = 'post';
         const producerUrl = 'http://localhost:6000/produce';
         const headers = {'Content-Type': 'application/json'};
@@ -96,16 +107,31 @@ describe('tests', () => {
     });
 });
 
-const produce = (url: string, batch: any[]) =>
+const produce = (url: string, batch: any[], headers?: object) =>
     fetch(url, {
         method: 'post',
         body: JSON.stringify(batch),
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json', ...headers},
     });
 
-const mockHttpTarget = (route: string, statusCode: number) =>
-    fakeHttpServer.mock({
-        method: 'post',
-        url: route,
-        statusCode,
+const mockHttpTarget = () =>
+    wireMock.mappings.createMapping({
+        request: {
+            method: 'POST',
+            urlPathPattern: `/consume`,
+        },
+        response: {
+            status: 200,
+        },
     });
+
+const getCall = async (mapping: StubMapping, callIndex = 0) => {
+    const requestsDetails = await wireMock.requests.findRequests(mapping.request!);
+    const request = requestsDetails.requests[callIndex];
+    return {
+        method: request.method,
+        url: request.url,
+        body: JSON.parse(request.body),
+        headers: request.headers,
+    };
+};

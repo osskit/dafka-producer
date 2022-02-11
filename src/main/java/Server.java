@@ -1,5 +1,6 @@
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -9,10 +10,8 @@ import io.prometheus.client.hotspot.DefaultExports;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
-import java.util.Iterator;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -32,7 +31,7 @@ public class Server {
 
     public Server start() throws IOException {
         server = HttpServer.create(new InetSocketAddress(Config.PORT), 0);
-        isAliveGetRoute(server);
+        healthcheckGetRoute(server);
         producePostRoute(server);
         if (Config.USE_PROMETHEUS) {
             DefaultExports.initialize();
@@ -47,8 +46,8 @@ public class Server {
         server.stop(0);
     }
 
-    private void isAliveGetRoute(HttpServer server) {
-        var httpContext = server.createContext("/isAlive");
+    private void healthcheckGetRoute(HttpServer server) {
+        var httpContext = server.createContext("/healthcheck");
         httpContext.setHandler(
             new HttpHandler() {
                 @Override
@@ -77,6 +76,7 @@ public class Server {
                         exchange.sendResponseHeaders(404, -1);
                         return;
                     }
+
                     try {
                         var body = CharStreams.toString(
                             new InputStreamReader(exchange.getRequestBody(), Charsets.UTF_8)
@@ -87,10 +87,10 @@ public class Server {
                                 jsonItem -> {
                                     var item = new JSONObject(jsonItem.toString());
                                     return new ProducerRequest(
-                                        tryGetValue(item, "topic", null),
-                                        tryGetValue(item, "key", null),
-                                        tryGetValue(item, "message", "value"),
-                                        tryGetHeaders(item)
+                                        tryGetValue(item, "topic"),
+                                        tryGetValue(item, "key"),
+                                        tryGetValue(item, "value"),
+                                        tracingHeaders(exchange.getRequestHeaders())
                                     );
                                 }
                             )
@@ -113,33 +113,45 @@ public class Server {
         );
     }
 
-    private Iterable<Header> tryGetHeaders(JSONObject item) {
-        if (item.has("headers")) {
-            JSONObject headersJson = item.getJSONObject("headers");
-            Iterator<String> keys = headersJson.keys();
-            if (keys.hasNext()) {
-                RecordHeaders headers = new RecordHeaders();
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    headers.add(key, headersJson.getString(key).getBytes());
-                }
-                return headers;
-            }
+    private static String tryGetValue(JSONObject json, String key) {
+        if (json.has(key)) {
+            return json.get(key).toString();
         }
-        return null;
+        throw new IllegalArgumentException(key + " is missing");
     }
 
-    private static String tryGetValue(JSONObject json, String option1, String option2) {
-        if (json.has(option1)) {
-            return json.get(option1).toString();
+    private RecordHeaders tracingHeaders(Headers headers) {
+        var recordHeaders = new RecordHeaders();
+
+        var requestId = headers.getFirst("x-request-id");
+        if (requestId != null) {
+            recordHeaders.add("x-request-id", requestId.getBytes());
         }
-        if (json.has(option2)) {
-            return json.get(option2).toString();
+        var traceId = headers.getFirst("x-b3-traceid");
+        if (traceId != null) {
+            recordHeaders.add("x-b3-traceid", traceId.getBytes());
+        }
+        var spanId = headers.getFirst("x-b3-spanid");
+        if (spanId != null) {
+            recordHeaders.add("x-b3-spanid", spanId.getBytes());
+        }
+        var parentSpanId = headers.getFirst("x-b3-parentspanid");
+        if (parentSpanId != null) {
+            recordHeaders.add("x-b3-parentspanid", parentSpanId.getBytes());
+        }
+        var sampled = headers.getFirst("x-b3-sampled");
+        if (sampled != null) {
+            recordHeaders.add("x-b3-sampled", sampled.getBytes());
+        }
+        var flags = headers.getFirst("x-b3-flags");
+        if (flags != null) {
+            recordHeaders.add("x-b3-flags", flags.getBytes());
+        }
+        var spanContext = headers.getFirst("x-ot-span-context");
+        if (spanContext != null) {
+            recordHeaders.add("x-ot-span-context", spanContext.getBytes());
         }
 
-        if (option2 == null) {
-            throw new IllegalArgumentException(option1 + " is missing");
-        }
-        throw new IllegalArgumentException(option2 + " is missing");
+        return recordHeaders;
     }
 }
