@@ -54,7 +54,7 @@ public class Monitor {
                 new JSONObject()
                     .put("topic", producerRequest.topic)
                     .put("key", producerRequest.key)
-                    .put("value",  producerRequest.value)
+                    .put("value", producerRequest.value)
                     .put("headers", headers)
             );
 
