@@ -21,9 +21,9 @@ describe('tests', () => {
         await wireMock.global.resetAll();
     });
 
-    it('liveliness', async () => {
-        const producer = await fetch('http://localhost:6000/healthcheck');
-        const consumer = await fetch('http://localhost:4001/healthcheck');
+    it('readiness', async () => {
+        const producer = await fetch('http://localhost:6000/ready');
+        const consumer = await fetch('http://localhost:4001/ready');
 
         expect(producer.ok).toBeTruthy();
         expect(consumer.ok).toBeTruthy();
