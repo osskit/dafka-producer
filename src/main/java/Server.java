@@ -33,6 +33,8 @@ public class Server {
         server = HttpServer.create(new InetSocketAddress(Config.PORT), 0);
         healthcheckGetRoute(server);
         producePostRoute(server);
+        aliveRoute(server);
+        readyRoute(server);
         if (Config.USE_PROMETHEUS) {
             DefaultExports.initialize();
             new HTTPServer(server, CollectorRegistry.defaultRegistry, false);
@@ -61,6 +63,45 @@ public class Server {
                         return;
                     }
                     exchange.sendResponseHeaders(204, -1);
+                }
+            }
+        );
+    }
+
+    private void aliveRoute(final HttpServer server) {
+        final var httpContext = server.createContext("/alive");
+
+        httpContext.setHandler(
+            new HttpHandler() {
+                @Override
+                public void handle(final HttpExchange exchange) throws IOException {
+                    if (!exchange.getRequestMethod().equals("GET")) {
+                        exchange.sendResponseHeaders(404, -1);
+                        return;
+                    }
+
+                    writeResponse(204, exchange);
+                }
+            }
+        );
+    }
+
+    private void readyRoute(final HttpServer server) {
+        final var httpContext = server.createContext("/ready");
+
+        httpContext.setHandler(
+            new HttpHandler() {
+                @Override
+                public void handle(final HttpExchange exchange) throws IOException {
+                    if (!exchange.getRequestMethod().equals("GET")) {
+                        exchange.sendResponseHeaders(404, -1);
+                        return;
+                    }
+
+                    if (!producer.ready()) {
+                        exchange.sendResponseHeaders(500, -1);
+                        return;
+                    }
                 }
             }
         );
