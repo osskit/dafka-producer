@@ -80,7 +80,7 @@ public class Server {
                         return;
                     }
 
-                    writeResponse(204, exchange);
+                    exchange.sendResponseHeaders(204, -1);
                 }
             }
         );
