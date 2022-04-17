@@ -102,6 +102,8 @@ public class Server {
                         exchange.sendResponseHeaders(500, -1);
                         return;
                     }
+
+                    exchange.sendResponseHeaders(204, -1);
                 }
             }
         );
