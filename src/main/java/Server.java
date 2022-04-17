@@ -31,7 +31,6 @@ public class Server {
 
     public Server start() throws IOException {
         server = HttpServer.create(new InetSocketAddress(Config.PORT), 0);
-        healthcheckGetRoute(server);
         producePostRoute(server);
         aliveRoute(server);
         readyRoute(server);
@@ -46,26 +45,6 @@ public class Server {
 
     public void close() {
         server.stop(0);
-    }
-
-    private void healthcheckGetRoute(HttpServer server) {
-        var httpContext = server.createContext("/healthcheck");
-        httpContext.setHandler(
-            new HttpHandler() {
-                @Override
-                public void handle(HttpExchange exchange) throws IOException {
-                    if (!exchange.getRequestMethod().equals("GET")) {
-                        exchange.sendResponseHeaders(404, -1);
-                        return;
-                    }
-                    if (!producer.ready()) {
-                        exchange.sendResponseHeaders(500, -1);
-                        return;
-                    }
-                    exchange.sendResponseHeaders(204, -1);
-                }
-            }
-        );
     }
 
     private void aliveRoute(final HttpServer server) {
