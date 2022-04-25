@@ -7,13 +7,11 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         Config.init();
-        System.out.println("config init");
         Monitor.init();
-        System.out.println("monitor init");
-        producer = new Producer(config, monitor).start();
-        System.out.println("producer started");
-        server = new Server(config, monitor, producer).start();
-        System.out.println("server started");
+        producer = new Producer(config, monitor);
+        server = new Server(config, monitor, producer);
+        server.start();
+        producer.start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> close()));
         Monitor.started();
     }
