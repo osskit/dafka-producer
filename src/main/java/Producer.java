@@ -16,7 +16,6 @@ public class Producer {
 
     public Producer start() {
         kafkaProducer = new KafkaCreator().createProducer();
-        checkReadiness();
         return this;
     }
 
