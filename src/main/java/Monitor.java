@@ -78,7 +78,7 @@ public class Monitor {
     }
 
     public static void serviceShutdown() {
-        JSONObject log = new JSONObject().put("level", "info").put("message", "kafka-producer shutdown");
+        JSONObject log = new JSONObject().put("level", "info").put("message", "service shutdown");
         write(log);
     }
 
