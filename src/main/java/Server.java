@@ -10,6 +10,7 @@ import io.prometheus.client.hotspot.DefaultExports;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.apache.kafka.common.header.internals.RecordHeaders;
@@ -34,6 +35,8 @@ public class Server {
         producePostRoute(server);
         aliveRoute(server);
         readyRoute(server);
+        server.setExecutor(Executors.newCachedThreadPool());
+
         if (Config.USE_PROMETHEUS) {
             DefaultExports.initialize();
             new HTTPServer(server, CollectorRegistry.defaultRegistry, false);
