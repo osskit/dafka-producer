@@ -72,11 +72,6 @@ public class Monitor {
         produceError.inc();
     }
 
-    public static void started() {
-        JSONObject log = new JSONObject().put("level", "info").put("message", "kafka-producer started");
-        write(log);
-    }
-
     public static void ready() {
         JSONObject log = new JSONObject().put("level", "info").put("message", "kafka-producer ready");
         write(log);
@@ -89,5 +84,15 @@ public class Monitor {
 
     private static void write(JSONObject log) {
         System.out.println(log.toString());
+    }
+
+    public static void httpServerStarted() {
+        JSONObject log = new JSONObject().put("level", "info").put("message", "http server started");
+        write(log);
+    }
+
+    public static void producerStarted() {
+        JSONObject log = new JSONObject().put("level", "info").put("message", "producer started");
+        write(log);
     }
 }

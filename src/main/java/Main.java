@@ -13,7 +13,6 @@ public class Main {
         server.start();
         producer.start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> close()));
-        Monitor.started();
     }
 
     private static void close() {

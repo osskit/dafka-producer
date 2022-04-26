@@ -40,6 +40,7 @@ public class Server {
         } else {
             server.start();
         }
+        Monitor.httpServerStarted();
         return this;
     }
 
