@@ -8,6 +8,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Config.init();
         Monitor.init();
+        Monitor.startingService();
         producer = new Producer(config, monitor);
         server = new Server(config, monitor, producer);
         server.start();

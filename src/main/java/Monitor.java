@@ -95,4 +95,9 @@ public class Monitor {
         JSONObject log = new JSONObject().put("level", "info").put("message", "producer started");
         write(log);
     }
+
+    public static void startingService() {
+        JSONObject log = new JSONObject().put("level", "info").put("message", "starting service");
+        write(log);
+    }
 }
