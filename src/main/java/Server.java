@@ -58,6 +58,7 @@ public class Server {
             new HttpHandler() {
                 @Override
                 public void handle(final HttpExchange exchange) throws IOException {
+                    System.out.println("calling /alive");
                     if (!exchange.getRequestMethod().equals("GET")) {
                         exchange.sendResponseHeaders(404, -1);
                         return;
