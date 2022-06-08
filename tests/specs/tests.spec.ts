@@ -74,7 +74,6 @@ describe('tests', () => {
         );
         await delay(1000);
 
-        console.log(await getCall(target));
         expect(await getCall(target)).toMatchSnapshot({
             headers: {'x-record-timestamp': expect.any(String), 'x-record-offset': expect.any(String)},
         });
