@@ -46,7 +46,7 @@ describe('tests', () => {
         });
     });
 
-    it.only('produce with headers', async () => {
+    it('produce with headers', async () => {
         const target = await mockHttpTarget();
 
         await produce(
