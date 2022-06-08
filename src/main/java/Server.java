@@ -117,7 +117,7 @@ public class Server {
                                         tryGetValue(item, "topic"),
                                         tryGetValue(item, "key"),
                                         tryGetValue(item, "value"),
-                                        tracingHeaders(exchange.getRequestHeaders())
+                                        getHeaders(exchange.getRequestHeaders())
                                     );
                                 }
                             )
@@ -147,7 +147,7 @@ public class Server {
         throw new IllegalArgumentException(key + " is missing");
     }
 
-    private RecordHeaders tracingHeaders(Headers headers) {
+    private RecordHeaders getHeaders(Headers headers) {
         var recordHeaders = new RecordHeaders();
 
         var requestId = headers.getFirst("x-request-id");
@@ -177,6 +177,26 @@ public class Server {
         var spanContext = headers.getFirst("x-ot-span-context");
         if (spanContext != null) {
             recordHeaders.add("x-ot-span-context", spanContext.getBytes());
+        }
+        var ceSpecVersion = headers.getFirst("ce-specversion");
+        if (ceSpecVersion != null) {
+            recordHeaders.add("ce-specversion", ceSpecVersion.getBytes());
+        }
+        var ceSource = headers.getFirst("ce-source");
+        if (ceSource != null) {
+            recordHeaders.add("ce-source", ceSource.getBytes());
+        }
+        var ceTime = headers.getFirst("ce-time");
+        if (ceTime != null) {
+            recordHeaders.add("ce-time", ceTime.getBytes());
+        }
+        var ceId = headers.getFirst("ce-id");
+        if (ceId != null) {
+            recordHeaders.add("ce-id", ceId.getBytes());
+        }
+        var ceType = headers.getFirst("ce-type");
+        if (ceType != null) {
+            recordHeaders.add("ce-type", ceType.getBytes());
         }
 
         return recordHeaders;
