@@ -66,10 +66,10 @@ describe('tests', () => {
                 'x-b3-sampled': '1',
                 'x-b3-flags': '1',
                 'x-ot-span-context': 'foo',
-                'ce_specversion': '1.0',
-                'ce_time': '1234',
-                'ce_id': 'uuid',
-                'ce_source': 'source'
+                ce_specversion: '1.0',
+                ce_time: '1234',
+                ce_id: 'uuid',
+                ce_source: 'source',
             }
         );
         await delay(1000);
