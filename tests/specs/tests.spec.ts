@@ -46,7 +46,7 @@ describe('tests', () => {
         });
     });
 
-    it('produce with headers', async () => {
+    it.only('produce with headers', async () => {
         const target = await mockHttpTarget();
 
         await produce(
@@ -66,10 +66,15 @@ describe('tests', () => {
                 'x-b3-sampled': '1',
                 'x-b3-flags': '1',
                 'x-ot-span-context': 'foo',
+                'ce_specversion': '1.0',
+                'ce_time': '1234',
+                'ce_id': 'uuid',
+                'ce_source': 'source'
             }
         );
         await delay(1000);
 
+        console.log(await getCall(target));
         expect(await getCall(target)).toMatchSnapshot({
             headers: {'x-record-timestamp': expect.any(String), 'x-record-offset': expect.any(String)},
         });
