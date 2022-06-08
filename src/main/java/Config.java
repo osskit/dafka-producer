@@ -23,7 +23,8 @@ class Config {
     // Correlation
     public static boolean ENFORCE_CORRELATION_ID;
     public static String CORRELATION_ID_HEADER_KEY;
-    public static String HEADERS_PREFIX;
+    public static String TRACING_HEADERS_PREFIX;
+    public static String CE_HEADERS_PREFIX;
 
     //Monitoring
     public static boolean USE_PROMETHEUS;
@@ -51,7 +52,8 @@ class Config {
 
         ENFORCE_CORRELATION_ID = getOptionalBool(dotenv, "ENFORCE_CORRELATION_ID", false);
         CORRELATION_ID_HEADER_KEY = getOptionalString(dotenv, "CORRELATION_ID_HEADER_KEY", "x-correlation-id");
-        HEADERS_PREFIX = getOptionalString(dotenv, "HEADERS_PREFIX", "x-");
+        TRACING_HEADERS_PREFIX = getOptionalString(dotenv, "TRACING_HEADERS_PREFIX", "x-");
+        CE_HEADERS_PREFIX = getOptionalString(dotenv, "CE_HEADERS_PREFIX", "ce_");
 
         USE_PROMETHEUS = getOptionalBool(dotenv, "USE_PROMETHEUS", false);
         PROMETHEUS_BUCKETS = getOptionalString(dotenv, PROMETHEUS_BUCKETS, "0.003,0.03,0.1,0.3,1.5,10");

@@ -139,7 +139,7 @@ public class Server {
         var recordHeaders = new RecordHeaders();
         headers.forEach(
             (key, value) -> {
-                if (key.toLowerCase().startsWith(Config.HEADERS_PREFIX)) {
+                if (key.toLowerCase().startsWith(Config.TRACING_HEADERS_PREFIX) || key.toLowerCase().startsWith(Config.CE_HEADERS_PREFIX)) {
                     recordHeaders.add(key, value.get(0).getBytes());
                 }
             }
