@@ -180,23 +180,23 @@ public class Server {
         }
         var ceSpecVersion = headers.getFirst("ce-specversion");
         if (ceSpecVersion != null) {
-            recordHeaders.add("ce-specversion", ceSpecVersion.getBytes());
+            recordHeaders.add("ce_specversion", ceSpecVersion.getBytes());
         }
         var ceSource = headers.getFirst("ce-source");
         if (ceSource != null) {
-            recordHeaders.add("ce-source", ceSource.getBytes());
+            recordHeaders.add("ce_source", ceSource.getBytes());
         }
         var ceTime = headers.getFirst("ce-time");
         if (ceTime != null) {
-            recordHeaders.add("ce-time", ceTime.getBytes());
+            recordHeaders.add("ce_time", ceTime.getBytes());
         }
         var ceId = headers.getFirst("ce-id");
         if (ceId != null) {
-            recordHeaders.add("ce-id", ceId.getBytes());
+            recordHeaders.add("ce_id", ceId.getBytes());
         }
         var ceType = headers.getFirst("ce-type");
         if (ceType != null) {
-            recordHeaders.add("ce-type", ceType.getBytes());
+            recordHeaders.add("ce_type", ceType.getBytes());
         }
 
         return recordHeaders;
