@@ -10,7 +10,7 @@ import io.prometheus.client.hotspot.DefaultExports;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -148,7 +148,7 @@ public class Server {
         throw new IllegalArgumentException(key + " is missing");
     }
 
-    private RecordHeaders getHeaders(Headers headers, ArrayList<String> headersList) {
+    private RecordHeaders getHeaders(Headers headers, List<String> headersList) {
         var recordHeaders = new RecordHeaders();
 
         headersList.forEach(
