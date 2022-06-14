@@ -65,11 +65,7 @@ describe('tests', () => {
                 'x-b3-parentspanid': '101112',
                 'x-b3-sampled': '1',
                 'x-b3-flags': '1',
-                'x-ot-span-context': 'foo',
-                'ce-specversion': '1.0',
-                'ce-time': '1234',
-                'ce-id': 'uuid',
-                'ce-source': 'source',
+                'x-ot-span-context': 'foo'
             }
         );
         await delay(1000);

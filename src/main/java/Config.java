@@ -1,6 +1,9 @@
 import io.github.cdimascio.dotenv.Dotenv;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 class Config {
 
@@ -12,6 +15,7 @@ class Config {
     public static String READINESS_TOPIC;
     public static int LINGER_TIME_MS;
     public static String COMPRESSION_TYPE;
+    public static ArrayList<String> PASSTHROUGH_HEADERS;
 
     //Authentication
     public static boolean USE_SASL_AUTH;
@@ -33,6 +37,7 @@ class Config {
         READINESS_TOPIC = getOptionalString(dotenv, "READINESS_TOPIC", null);
         LINGER_TIME_MS = getOptionalInt(dotenv, "LINGER_TIME_MS", 0);
         COMPRESSION_TYPE = getOptionalString(dotenv, "COMPRESSION_TYPE", "none");
+        PASSTHROUGH_HEADERS = getOptionalStringList(dotenv, "PASSTHROUGH_HEADERS", new ArrayList<>());
 
         USE_SASL_AUTH = getOptionalBool(dotenv, "USE_SASL_AUTH", false);
         if (USE_SASL_AUTH) {
@@ -97,6 +102,16 @@ class Config {
     private static boolean getOptionalBool(Dotenv dotenv, String name, boolean fallback) {
         try {
             return Boolean.parseBoolean(getString(dotenv, name));
+        } catch (Exception e) {
+            return fallback;
+        }
+    }
+
+    private static ArrayList<String> getOptionalStringList(Dotenv dotenv, String name, ArrayList<String> fallback) {
+        try {
+            String[] array = getString(dotenv, name).split(",");
+            List<String> fixedArray = Arrays.asList(array);
+            return new ArrayList<String>(fixedArray);
         } catch (Exception e) {
             return fallback;
         }

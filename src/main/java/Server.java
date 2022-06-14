@@ -10,6 +10,7 @@ import io.prometheus.client.hotspot.DefaultExports;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -117,7 +118,7 @@ public class Server {
                                         tryGetValue(item, "topic"),
                                         tryGetValue(item, "key"),
                                         tryGetValue(item, "value"),
-                                        getHeaders(exchange.getRequestHeaders())
+                                        getHeaders(exchange.getRequestHeaders(), Config.PASSTHROUGH_HEADERS)
                                     );
                                 }
                             )
@@ -147,57 +148,16 @@ public class Server {
         throw new IllegalArgumentException(key + " is missing");
     }
 
-    private RecordHeaders getHeaders(Headers headers) {
+    private RecordHeaders getHeaders(Headers headers, ArrayList<String> headersList) {
         var recordHeaders = new RecordHeaders();
+        
+        headersList.forEach(header -> { 
+            var recordHeader = headers.getFirst(header);
 
-        var requestId = headers.getFirst("x-request-id");
-        if (requestId != null) {
-            recordHeaders.add("x-request-id", requestId.getBytes());
-        }
-        var traceId = headers.getFirst("x-b3-traceid");
-        if (traceId != null) {
-            recordHeaders.add("x-b3-traceid", traceId.getBytes());
-        }
-        var spanId = headers.getFirst("x-b3-spanid");
-        if (spanId != null) {
-            recordHeaders.add("x-b3-spanid", spanId.getBytes());
-        }
-        var parentSpanId = headers.getFirst("x-b3-parentspanid");
-        if (parentSpanId != null) {
-            recordHeaders.add("x-b3-parentspanid", parentSpanId.getBytes());
-        }
-        var sampled = headers.getFirst("x-b3-sampled");
-        if (sampled != null) {
-            recordHeaders.add("x-b3-sampled", sampled.getBytes());
-        }
-        var flags = headers.getFirst("x-b3-flags");
-        if (flags != null) {
-            recordHeaders.add("x-b3-flags", flags.getBytes());
-        }
-        var spanContext = headers.getFirst("x-ot-span-context");
-        if (spanContext != null) {
-            recordHeaders.add("x-ot-span-context", spanContext.getBytes());
-        }
-        var ceSpecVersion = headers.getFirst("ce-specversion");
-        if (ceSpecVersion != null) {
-            recordHeaders.add("ce_specversion", ceSpecVersion.getBytes());
-        }
-        var ceSource = headers.getFirst("ce-source");
-        if (ceSource != null) {
-            recordHeaders.add("ce_source", ceSource.getBytes());
-        }
-        var ceTime = headers.getFirst("ce-time");
-        if (ceTime != null) {
-            recordHeaders.add("ce_time", ceTime.getBytes());
-        }
-        var ceId = headers.getFirst("ce-id");
-        if (ceId != null) {
-            recordHeaders.add("ce_id", ceId.getBytes());
-        }
-        var ceType = headers.getFirst("ce-type");
-        if (ceType != null) {
-            recordHeaders.add("ce_type", ceType.getBytes());
-        }
+            if (recordHeader != null) {
+                recordHeaders.add(header, recordHeader.getBytes());
+            }
+        });
 
         return recordHeaders;
     }
