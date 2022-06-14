@@ -65,7 +65,7 @@ describe('tests', () => {
                 'x-b3-parentspanid': '101112',
                 'x-b3-sampled': '1',
                 'x-b3-flags': '1',
-                'x-ot-span-context': 'foo'
+                'x-ot-span-context': 'foo',
             }
         );
         await delay(1000);

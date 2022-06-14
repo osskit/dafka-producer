@@ -150,14 +150,16 @@ public class Server {
 
     private RecordHeaders getHeaders(Headers headers, ArrayList<String> headersList) {
         var recordHeaders = new RecordHeaders();
-        
-        headersList.forEach(header -> { 
-            var recordHeader = headers.getFirst(header);
 
-            if (recordHeader != null) {
-                recordHeaders.add(header, recordHeader.getBytes());
+        headersList.forEach(
+            header -> {
+                var recordHeader = headers.getFirst(header);
+
+                if (recordHeader != null) {
+                    recordHeaders.add(header, recordHeader.getBytes());
+                }
             }
-        });
+        );
 
         return recordHeaders;
     }
