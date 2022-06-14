@@ -15,7 +15,7 @@ class Config {
     public static String READINESS_TOPIC;
     public static int LINGER_TIME_MS;
     public static String COMPRESSION_TYPE;
-    public static ArrayList<String> PASSTHROUGH_HEADERS;
+    public static List<String> PASSTHROUGH_HEADERS;
 
     //Authentication
     public static boolean USE_SASL_AUTH;
