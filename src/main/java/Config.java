@@ -107,13 +107,13 @@ class Config {
         }
     }
 
-    private static ArrayList<String> getOptionalStringList(Dotenv dotenv, String name, ArrayList<String> fallback) {
-        try {
-            String[] array = getString(dotenv, name).split(",");
-            List<String> fixedArray = Arrays.asList(array);
-            return new ArrayList<String>(fixedArray);
-        } catch (Exception e) {
+    private static List<String> getOptionalStringList(Dotenv dotenv, String name, List<String> fallback) {
+        String value = dotenv.get(name);
+
+        if (value == null) {
             return fallback;
         }
+
+        return Arrays.asList(value.replaceAll(" ", "").split(","));
     }
 }
