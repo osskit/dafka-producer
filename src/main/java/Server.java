@@ -118,7 +118,7 @@ public class Server {
                                         tryGetValue(item, "topic"),
                                         tryGetValue(item, "key"),
                                         tryGetValue(item, "value"),
-                                        getHeaders(exchange.getRequestHeaders(), Config.PASSTHROUGH_HEADERS)
+                                        getHeaders(exchange.getRequestHeaders(), Config.DEFAULT_PASSTHROUGH_HEADERS.addAll(Config.PASSTHROUGH_HEADERS))
                                     );
                                 }
                             )
@@ -150,7 +150,7 @@ public class Server {
 
     private RecordHeaders getHeaders(Headers headers, List<String> headersList) {
         var recordHeaders = new RecordHeaders();
-
+        
         headersList.forEach(
             header -> {
                 var recordHeader = headers.getFirst(header);

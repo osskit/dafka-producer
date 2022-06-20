@@ -28,6 +28,11 @@ class Config {
     public static boolean USE_PROMETHEUS;
     public static String PROMETHEUS_BUCKETS;
 
+    // Default values
+    public static ArrayList<String> DEFAULT_PASSTHROUGH_HEADERS = new ArrayList<String>() {
+        "x-request-id","x-b3-traceid","x-b3-spanid","x-b3-parentspanid","x-b3-sampled","x-b3-flags", "x-ot-span-context"
+    }
+
     public static void init() throws Exception {
         Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
 
