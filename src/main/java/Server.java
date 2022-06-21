@@ -162,12 +162,11 @@ public class Server {
         Iterator<String> keys = obj.keys();
 
         System.out.println("keys" + keys);
-        while(keys.hasNext()) {
-            String key = (String)keys.next();
-            String value =  obj.getString(key); 
+        while (keys.hasNext()) {
+            String key = (String) keys.next();
+            String value = obj.getString(key);
             System.out.println("value" + value);
             System.out.println("key" + key);
-
 
             recordHeaders.add(key, value.toString().getBytes());
         }
