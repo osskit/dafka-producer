@@ -8,7 +8,6 @@ services:
         environment:
             - PORT=6000
             - KAFKA_BROKER=kafka:9092
-            - PASSTHROUGH_HEADERS=x-request-id,x-b3-traceid,x-b3-spanid,x-b3-parentspanid,x-b3-sampled,x-b3-flags,x-ot-span-context
 
     consumer:
         image: osskit/dafka-consumer:5.1.4

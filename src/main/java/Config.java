@@ -1,9 +1,6 @@
 import io.github.cdimascio.dotenv.Dotenv;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 class Config {
 
@@ -15,7 +12,6 @@ class Config {
     public static String READINESS_TOPIC;
     public static int LINGER_TIME_MS;
     public static String COMPRESSION_TYPE;
-    public static List<String> PASSTHROUGH_HEADERS;
 
     //Authentication
     public static boolean USE_SASL_AUTH;
@@ -28,11 +24,6 @@ class Config {
     public static boolean USE_PROMETHEUS;
     public static String PROMETHEUS_BUCKETS;
 
-    // Default values
-    public static ArrayList<String> DEFAULT_PASSTHROUGH_HEADERS = new ArrayList<String>() {
-        "x-request-id","x-b3-traceid","x-b3-spanid","x-b3-parentspanid","x-b3-sampled","x-b3-flags", "x-ot-span-context"
-    }
-
     public static void init() throws Exception {
         Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
 
@@ -42,7 +33,6 @@ class Config {
         READINESS_TOPIC = getOptionalString(dotenv, "READINESS_TOPIC", null);
         LINGER_TIME_MS = getOptionalInt(dotenv, "LINGER_TIME_MS", 0);
         COMPRESSION_TYPE = getOptionalString(dotenv, "COMPRESSION_TYPE", "none");
-        PASSTHROUGH_HEADERS = getOptionalStringList(dotenv, "PASSTHROUGH_HEADERS", new ArrayList<>());
 
         USE_SASL_AUTH = getOptionalBool(dotenv, "USE_SASL_AUTH", false);
         if (USE_SASL_AUTH) {
@@ -110,15 +100,5 @@ class Config {
         } catch (Exception e) {
             return fallback;
         }
-    }
-
-    private static List<String> getOptionalStringList(Dotenv dotenv, String name, List<String> fallback) {
-        String value = dotenv.get(name);
-
-        if (value == null) {
-            return fallback;
-        }
-
-        return Arrays.asList(value.replaceAll(" ", "").split(","));
     }
 }

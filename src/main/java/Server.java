@@ -10,6 +10,7 @@ import io.prometheus.client.hotspot.DefaultExports;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -118,7 +119,7 @@ public class Server {
                                         tryGetValue(item, "topic"),
                                         tryGetValue(item, "key"),
                                         tryGetValue(item, "value"),
-                                        getHeaders(exchange.getRequestHeaders(), Config.DEFAULT_PASSTHROUGH_HEADERS.addAll(Config.PASSTHROUGH_HEADERS))
+                                        getHeaders(tryGetOptionalValue(item, "headers"))
                                     );
                                 }
                             )
@@ -148,18 +149,28 @@ public class Server {
         throw new IllegalArgumentException(key + " is missing");
     }
 
-    private RecordHeaders getHeaders(Headers headers, List<String> headersList) {
-        var recordHeaders = new RecordHeaders();
-        
-        headersList.forEach(
-            header -> {
-                var recordHeader = headers.getFirst(header);
+    private static String tryGetOptionalValue(JSONObject json, String key) {
+        if (json.has(key)) {
+            return json.get(key).toString();
+        }
+        return "{}";
+    }
 
-                if (recordHeader != null) {
-                    recordHeaders.add(header, recordHeader.getBytes());
-                }
-            }
-        );
+    private RecordHeaders getHeaders(String headers) {
+        var recordHeaders = new RecordHeaders();
+        JSONObject obj = new JSONObject(headers);
+        Iterator<String> keys = obj.keys();
+
+        System.out.println("keys" + keys);
+        while(keys.hasNext()) {
+            String key = (String)keys.next();
+            String value =  obj.getString(key); 
+            System.out.println("value" + value);
+            System.out.println("key" + key);
+
+
+            recordHeaders.add(key, value.toString().getBytes());
+        }
 
         return recordHeaders;
     }
