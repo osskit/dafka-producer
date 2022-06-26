@@ -9,6 +9,7 @@ Dockerized kafka producer
 
 ## Overview
 Dafka-producer is a dockerized Kafka producer used to abstract producing messages to a kafka topic.
+
 Producing messages is as simple as sending a POST request from your service to the dafka-producer, with the topic, value, key and headers of the request being the kafka message.
 
 ## Motivation
