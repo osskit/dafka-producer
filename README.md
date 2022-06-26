@@ -7,7 +7,45 @@ Dockerized kafka producer
 
 ## Introduction
 
-## Usage
+## Usage & Examples
+
+### docker-compose
+```
+version: '2.3'
+
+services:
+    producer:
+        build: ../
+        ports:
+            - 6000:6000
+        environment:
+            - PORT=6000
+            - KAFKA_BROKER=kafka:9092
+```
+in joint with `dafka-consumer`:
+```
+version: '2.3'
+
+services:
+    producer:
+        build: osskit/dafka-producer:5
+        ports:
+            - 6000:6000
+        environment:
+            - PORT=6000
+            - KAFKA_BROKER=kafka:9092
+
+    consumer:
+        image: osskit/dafka-consumer:5.1
+        ports:
+            - 4001:4001
+        environment:
+            - KAFKA_BROKER=kafka:9092
+            - GROUP_ID=consumer_1
+            - TARGET_BASE_URL=http://target:8080
+            - TOPICS_ROUTES=foo:/consume
+            - MONITORING_SERVER_PORT=4001
+```
 
 ## License
 MIT License
