@@ -78,5 +78,24 @@ services:
             - zookeeper
 ```
 
+## Parameters
+
+Container images are configured using parameters passed at runtime.
+
+| Parameter | Function |
+| :----: | --- |
+| `PORT=3000` | HTTP port to listen to incoming requests |
+| `KAFKA_BROKER=https://kafka-broker.com` | URL for the Kafka Broker |
+| `READINESS_TOPIC=readiness` | Producing to this topic will provide an healthcheck of the producer container |
+| `LINGER_TIME_MS=0` |  #optional |
+| `COMPRESSION_TYPE="none"` | #optional |
+| `USE_SASL_AUTH=false` | #optional |
+| `SASL_PASSWORD` | #optional |
+| `SASL_USERNAME` | #optional |
+| `TRUSTSTORE_FILE_PATH=null` | #optional |
+| `TRUSTSTORE_PASSWORD=true` | #optional |
+| `USE_PROMETHEUS=false` | #optional |
+| `PROMETHEUS_BUCKETS=0.003,0.03,0.1,0.3,1.5,10` | #optional |
+
 ## License
 MIT License
