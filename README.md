@@ -7,6 +7,7 @@ Dockerized kafka producer
 
 ## Overview
 Dafka-producer is a dockerized Kafka producer used to abstract producing messages to a kafka topic.
+Producing messages is as simple as sending a POST request from your service to the dafka-producer, with the topic, value, key and headers of the request being the kafka message.
 
 ### Motivation
 Why use this over just a Kafka client?
@@ -14,8 +15,8 @@ Why use this over just a Kafka client?
 * Separates configuration, everything that's related to Kafka is encapsulated in Dafka and not the service itself.
 * When testing your service you only test your service's logic and not the messaging layer implementation details.
 
+#### Design Diagram
 <img width="790" alt="image" src="https://user-images.githubusercontent.com/15312980/175814041-9991f7d5-830c-4e3f-9b2b-ad3e33228946.png">
-
 
 ## Usage & Examples
 
@@ -88,6 +89,10 @@ services:
             - zookeeper
 ```
 
+### Kubernetes
+You can use the provided [Helm Chart](https://github.com/osskit/dafka-producer-helm-chart), this gives you a `Deployment` separated from your service's `Pod`.
+
+It's also possible to use this as a `Sidecar`.
 ## Parameters
 
 Container images are configured using parameters passed at runtime.
