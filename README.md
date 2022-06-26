@@ -21,6 +21,21 @@ services:
         environment:
             - PORT=6000
             - KAFKA_BROKER=kafka:9092
+        depends_on:
+            - kafka
+    # Generic Kafka Setup Containers
+    zookeeper:
+        image: wurstmeister/zookeeper
+    kafka:
+        image: wurstmeister/kafka:2.12-2.2.0
+        ports:
+            - '9092:9092'
+        environment:
+            - KAFKA_ADVERTISED_HOST_NAME=kafka
+            - KAFKA_CREATE_TOPICS=foo:1:1
+            - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+        depends_on:
+            - zookeeper
 ```
 in joint with `dafka-consumer`:
 ```
@@ -34,9 +49,10 @@ services:
         environment:
             - PORT=6000
             - KAFKA_BROKER=kafka:9092
-
+        depends_on:
+            - kafka
     consumer:
-        image: osskit/dafka-consumer:5.1
+        image: osskit/dafka-consumer
         ports:
             - 4001:4001
         environment:
@@ -45,6 +61,21 @@ services:
             - TARGET_BASE_URL=http://target:8080
             - TOPICS_ROUTES=foo:/consume
             - MONITORING_SERVER_PORT=4001
+        depends_on:
+             - kafka
+    # Generic Kafka Setup Containers
+    zookeeper:
+        image: wurstmeister/zookeeper
+    kafka:
+        image: wurstmeister/kafka:2.12-2.2.0
+        ports:
+            - '9092:9092'
+        environment:
+            - KAFKA_ADVERTISED_HOST_NAME=kafka
+            - KAFKA_CREATE_TOPICS=foo:1:1
+            - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+        depends_on:
+            - zookeeper
 ```
 
 ## License
