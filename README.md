@@ -11,11 +11,11 @@ Dockerized kafka producer
 
 ### docker-compose
 ```
-version: '2.3'
+version: '3.9'
 
 services:
     producer:
-        build: osskit/dafka-producer:5
+        image: osskit/dafka-producer
         ports:
             - 6000:6000
         environment:
@@ -24,11 +24,11 @@ services:
 ```
 in joint with `dafka-consumer`:
 ```
-version: '2.3'
+version: '3.9'
 
 services:
     producer:
-        build: osskit/dafka-producer:5
+        image: osskit/dafka-producer
         ports:
             - 6000:6000
         environment:
