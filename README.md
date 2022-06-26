@@ -107,13 +107,13 @@ Container images are configured using parameters passed at runtime.
 | `READINESS_TOPIC` | `null` | Producing to this topic will provide an healthcheck of the producer container |
 | `LINGER_TIME_MS` | `0` | |
 | `COMPRESSION_TYPE` | `"none"` | |
-| `USE_SASL_AUTH` | `false` | |
-| `SASL_PASSWORD` | `required` if `USE_SASL_AUTH=true` | |
-| `SASL_USERNAME` | `required` if `USE_SASL_AUTH=true` | |
+| `USE_SASL_AUTH` | `false` | Use SASL authentication |
+| `SASL_USERNAME` | `required` if `USE_SASL_AUTH=true` | SASL Usernanme to authenticate |
+| `SASL_PASSWORD` | `required` if `USE_SASL_AUTH=true` | SASL Password to authenticate |
 | `TRUSTSTORE_FILE_PATH` | `null` | |
 | `TRUSTSTORE_PASSWORD` | `required` if `TRUSTORE_FILE_PATH != null` | |
-| `USE_PROMETHEUS` | `false` | |
-| `PROMETHEUS_BUCKETS` | `0.003,0.03,0.1,0.3,1.5,10` | |
+| `USE_PROMETHEUS` | `false` | Export metrics to Prometheus |
+| `PROMETHEUS_BUCKETS` | `0.003,0.03,0.1,0.3,1.5,10` | A list of Prometheus buckets to use |
 
 ## License
 MIT License
