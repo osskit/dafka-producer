@@ -15,7 +15,7 @@ version: '2.3'
 
 services:
     producer:
-        build: ../
+        build: osskit/dafka-producer:5
         ports:
             - 6000:6000
         environment:
