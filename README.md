@@ -51,7 +51,7 @@ services:
         depends_on:
             - zookeeper
 ```
-in joint with `dafka-consumer`:
+in joint with [`dafka-consumer`](https://github.com/osskit/dafka-consumer):
 ```
 version: '3.9'
 
@@ -105,13 +105,13 @@ Container images are configured using parameters passed at runtime.
 | `PORT` | `required` | Incoming requests' endpoint port | 
 | `KAFKA_BROKER` | `required` | URL of the Kafka Broker | 
 | `READINESS_TOPIC` | `null` | Producing to this topic will provide an healthcheck of the producer container |
-| `LINGER_TIME_MS` | `0` | |
-| `COMPRESSION_TYPE` | `"none"` | |
+| `LINGER_TIME_MS` | `0` | [Description for LINGER_TIME_MS](https://docs.confluent.io/platform/current/installation/configuration/producer-configs.html#producerconfigs_linger.ms)|
+| `COMPRESSION_TYPE` | `"none"` | [Description for COMPRESSION_TYPE](https://docs.confluent.io/platform/current/installation/configuration/producer-configs.html#producerconfigs_compression.type)|
 | `USE_SASL_AUTH` | `false` | Use SASL authentication |
 | `SASL_USERNAME` | `required` if `USE_SASL_AUTH=true` | SASL Usernanme to authenticate |
 | `SASL_PASSWORD` | `required` if `USE_SASL_AUTH=true` | SASL Password to authenticate |
-| `TRUSTSTORE_FILE_PATH` | `null` | |
-| `TRUSTSTORE_PASSWORD` | `required` if `TRUSTORE_FILE_PATH != null` | |
+| `TRUSTSTORE_FILE_PATH` | `null` | Truststore certificate file path |
+| `TRUSTSTORE_PASSWORD` | `required` if `TRUSTORE_FILE_PATH != null` | Truststore's password |
 | `USE_PROMETHEUS` | `false` | Export metrics to Prometheus |
 | `PROMETHEUS_BUCKETS` | `0.003,0.03,0.1,0.3,1.5,10` | A list of Prometheus buckets to use |
 
