@@ -36,10 +36,10 @@ class KafkaCreator {
     }
 
     private String getSaslMechanism() {
-        switch (Config.SASL_MECHANISM) {
-          case "plain":
+        switch (Config.SASL_MECHANISM.toUpperCase()) {
+          case "PLAIN":
             return "plain.PlainLoginModule";
-          case "scram":
+          case "SCRAM":
             return "scram.ScramLoginModule";
         }
         return "";
