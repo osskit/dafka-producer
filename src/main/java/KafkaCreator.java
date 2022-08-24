@@ -25,7 +25,7 @@ class KafkaCreator {
         props.put(
             "sasl.jaas.config",
             String.format(
-                "org.apache.kafka.common.security.\"%s\" required username=\"%s\" password=\"%s\";",
+                "org.apache.kafka.common.security.%s required username=\"%s\" password=\"%s\";",
                 getSaslMechanism(),
                 Config.SASL_USERNAME,
                 Config.SASL_PASSWORD
@@ -39,7 +39,7 @@ class KafkaCreator {
         switch (Config.SASL_MECHANISM.toUpperCase()) {
           case "PLAIN":
             return "plain.PlainLoginModule";
-          case "SCRAM":
+          case "SCRAM-SHA-512":
             return "scram.ScramLoginModule";
         }
         return "";
