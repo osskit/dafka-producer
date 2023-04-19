@@ -34,7 +34,7 @@ class Config {
 
         READINESS_TOPIC = getOptionalString(dotenv, "READINESS_TOPIC", null);
         LINGER_TIME_MS = getOptionalInt(dotenv, "LINGER_TIME_MS", 0);
-        LINGER_TIME_MS = getOptionalString(dotenv, "BATCH_SIZE", null);
+        BATCH_SIZE = getOptionalString(dotenv, "BATCH_SIZE", null);
         COMPRESSION_TYPE = getOptionalString(dotenv, "COMPRESSION_TYPE", "none");
 
         USE_SASL_AUTH = getOptionalBool(dotenv, "USE_SASL_AUTH", false);
