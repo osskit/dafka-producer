@@ -51,7 +51,11 @@ class KafkaCreator {
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.put("linger.ms", Config.LINGER_TIME_MS);
+        if (Config.BATCH_SIZE != null) {
+            props.put("batch.size", Config.BATCH_SIZE);
+        }
         props.put("compression.type", Config.COMPRESSION_TYPE);
+        
 
         return new KafkaProducer<>(props);
     }
