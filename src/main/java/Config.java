@@ -11,6 +11,7 @@ class Config {
     //Optional
     public static String READINESS_TOPIC;
     public static int LINGER_TIME_MS;
+    public static String BATCH_SIZE;
     public static String COMPRESSION_TYPE;
 
     //Authentication
@@ -33,6 +34,7 @@ class Config {
 
         READINESS_TOPIC = getOptionalString(dotenv, "READINESS_TOPIC", null);
         LINGER_TIME_MS = getOptionalInt(dotenv, "LINGER_TIME_MS", 0);
+        LINGER_TIME_MS = getOptionalString(dotenv, "BATCH_SIZE", null);
         COMPRESSION_TYPE = getOptionalString(dotenv, "COMPRESSION_TYPE", "none");
 
         USE_SASL_AUTH = getOptionalBool(dotenv, "USE_SASL_AUTH", false);
