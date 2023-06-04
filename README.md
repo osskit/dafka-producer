@@ -105,6 +105,7 @@ Container images are configured using parameters passed at runtime.
 | `PORT` | `required` | Incoming requests' endpoint port | 
 | `KAFKA_BROKER` | `required` | URL of the Kafka Broker | 
 | `READINESS_TOPIC` | `null` | Producing to this topic will provide an healthcheck of the producer container |
+| `ACKS` | `0` | The number of acknowledgments the producer requires the leader to have received before considering a request complete. See [docs](https://docs.confluent.io/platform/current/installation/configuration/producer-configs.html#acks) for more details  |
 | `LINGER_TIME_MS` | `0` | [Description for LINGER_TIME_MS](https://docs.confluent.io/platform/current/installation/configuration/producer-configs.html#producerconfigs_linger.ms)|
 | `COMPRESSION_TYPE` | `"none"` | [Description for COMPRESSION_TYPE](https://docs.confluent.io/platform/current/installation/configuration/producer-configs.html#producerconfigs_compression.type)|
 | `USE_SASL_AUTH` | `false` | Use SASL authentication |

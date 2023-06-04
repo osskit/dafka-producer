@@ -13,6 +13,7 @@ class Config {
     public static int LINGER_TIME_MS;
     public static String BATCH_SIZE;
     public static String COMPRESSION_TYPE;
+    public static int ACKS;
 
     //Authentication
     public static boolean USE_SASL_AUTH;
@@ -36,6 +37,7 @@ class Config {
         LINGER_TIME_MS = getOptionalInt(dotenv, "LINGER_TIME_MS", 0);
         BATCH_SIZE = getOptionalString(dotenv, "BATCH_SIZE", null);
         COMPRESSION_TYPE = getOptionalString(dotenv, "COMPRESSION_TYPE", "none");
+        ACKS = getOptionalInt(dotenv, "ACKS", 0);
 
         USE_SASL_AUTH = getOptionalBool(dotenv, "USE_SASL_AUTH", false);
         if (USE_SASL_AUTH) {
