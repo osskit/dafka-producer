@@ -1,4 +1,6 @@
 import java.util.Date;
+import java.util.concurrent.CompletableFuture;
+
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
@@ -27,7 +29,7 @@ public class Producer {
 
     public boolean produce(ProducerRequest producerRequest) {
         var executionStart = (new Date()).getTime();
-        kafkaProducer.send(
+        var kafkaFuture = kafkaProducer.send(
             new ProducerRecord<>(
                 producerRequest.topic,
                 null,
@@ -35,7 +37,15 @@ public class Producer {
                 producerRequest.key,
                 producerRequest.value,
                 producerRequest.headers
-            ),
+            )
+        );
+
+        var result = new CompletableFuture<Boolean>();
+
+        kafkaFuture.
+
+        /*
+        ,
             (metadata, err) -> {
                 if (err != null) {
                     ready = false;
@@ -45,7 +55,7 @@ public class Producer {
                 ready = true;
                 Monitor.produceSuccess(producerRequest, executionStart);
             }
-        );
+         */
         return true;
     }
 
