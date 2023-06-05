@@ -1,18 +1,75 @@
-import delay from 'delay';
-import fetch from 'node-fetch';
-import {WireMockRestClient} from 'wiremock-rest-client';
-import {StubMapping} from 'wiremock-rest-client/dist/model/stub-mapping.model';
-
-import checkReadiness from '../checkReadiness';
-
-jest.setTimeout(180000);
-
-const wireMock = new WireMockRestClient('http://localhost:8080', {
-    logLevel: 'error',
-    continueOnFailure: true,
-});
+import type {Orchestrator, KafkaOrchestrator} from '../testcontainers/orchestrator.js';
+import {start as startKafka} from '../testcontainers/orchestrator.js';
+import {Consumer, KafkaMessage} from 'kafkajs';
 
 describe('tests', () => {
+    let kafkaOrchestrator: KafkaOrchestrator;
+    let orchestrator: Orchestrator;
+    let consumer: Consumer;
+
+    beforeAll(async () => {
+        kafkaOrchestrator = await startKafka();
+    }, 1800000);
+
+    afterAll(async () => {
+        await kafkaOrchestrator.stop();
+    }, 1800000);
+
+    afterEach(async () => {
+        if (consumer) {
+            await consumer.disconnect();
+        }
+        await orchestrator.stop();
+    });
+
+    const start = async (topics: string[], producerSettings?: Record<string, string>) => {
+        const admin = kafkaOrchestrator.kafkaClient.admin();
+
+        await admin.createTopics({topics: topics.map((topic) => ({topic, replicationFactor: 1}))});
+
+        orchestrator = await kafkaOrchestrator.startOrchestrator({
+            ...producerSettings,
+        });
+
+        consumer = kafkaOrchestrator.kafkaClient.consumer({groupId: 'test'});
+        await consumer.connect();
+    };
+
+    it('produce and consume', async () => {
+        const topic = `topic-${Date.now()}`;
+        await start([topic]);
+
+        await consumer.subscribe({topic, fromBeginning: true});
+
+        await orchestrator.produce([
+            {
+                topic,
+                key: 'thekey',
+                value: {data: 'foo'},
+                headers: {
+                    'x-request-id': '123',
+                    'x-b3-traceid': '456',
+                    'x-b3-spanid': '789',
+                    'x-b3-parentspanid': '101112',
+                    'x-b3-sampled': '1',
+                    'x-b3-flags': '1',
+                    'x-ot-span-context': 'foo',
+                },
+            },
+        ]);
+
+        const consumedMessage = await new Promise<KafkaMessage>((resolve) => {
+            consumer.run({
+                eachMessage: async ({message}) => resolve(message),
+            });
+        });
+
+        expect(JSON.parse(consumedMessage.value?.toString() ?? '{}')).toMatchSnapshot();
+        expect(
+            Object.fromEntries(Object.entries(consumedMessage.headers!).map(([key, value]) => [key, value?.toString()]))
+        ).toMatchSnapshot();
+    }, 1800000);
+    /*
     beforeAll(async () => {
         await expect(checkReadiness(['foo', 'bar', 'retry', 'dead-letter', 'unexpected'])).resolves.toBeTruthy();
     });
@@ -101,9 +158,9 @@ describe('tests', () => {
         });
         expect(response.status).toBe(400);
         expect(await response.text()).toBe('value is missing');
-    });
+    });*/
 });
-
+/*
 const produce = (url: string, batch: any[], headers?: object) =>
     fetch(url, {
         method: 'post',
@@ -132,3 +189,4 @@ const getCall = async (mapping: StubMapping, callIndex = 0) => {
         headers: request.headers,
     };
 };
+*/

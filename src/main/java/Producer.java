@@ -1,6 +1,5 @@
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
-
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
@@ -42,20 +41,6 @@ public class Producer {
 
         var result = new CompletableFuture<Boolean>();
 
-        kafkaFuture.
-
-        /*
-        ,
-            (metadata, err) -> {
-                if (err != null) {
-                    ready = false;
-                    Monitor.produceError(err);
-                    return;
-                }
-                ready = true;
-                Monitor.produceSuccess(producerRequest, executionStart);
-            }
-         */
         return true;
     }
 

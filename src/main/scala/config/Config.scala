@@ -21,7 +21,7 @@ object Config {
   def build(): ConfigValue[Effect, Config] =
     (
       default("my-api").as[NonEmptyString],
-      env("APP_ENV").as[AppEnvironment].flatMap(KafkaConfig.apply),
+      KafkaConfig.apply,
     ).parMapN((name, kafkaConfig) => Config(name, kafkaConfig))
 }
 

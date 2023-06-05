@@ -37,10 +37,10 @@ class KafkaCreator {
 
     private String getSaslMechanism() {
         switch (Config.SASL_MECHANISM.toUpperCase()) {
-          case "PLAIN":
-            return "plain.PlainLoginModule";
-          case "SCRAM-SHA-512":
-            return "scram.ScramLoginModule";
+            case "PLAIN":
+                return "plain.PlainLoginModule";
+            case "SCRAM-SHA-512":
+                return "scram.ScramLoginModule";
         }
         return "";
     }
@@ -55,7 +55,6 @@ class KafkaCreator {
             props.put("batch.size", Config.BATCH_SIZE);
         }
         props.put("compression.type", Config.COMPRESSION_TYPE);
-        
 
         return new KafkaProducer<>(props);
     }

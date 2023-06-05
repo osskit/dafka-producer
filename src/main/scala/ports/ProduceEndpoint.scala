@@ -2,20 +2,19 @@ package ports
 
 import cats.effect.IO
 import endpoints4s.{algebra, generic}
+import endpoints4s.algebra.circe.JsonEntitiesFromCodecs
+import io.circe.Json
 
-case class ProduceRequest(topic: String, value: String)
+import io.circe.generic.auto._, io.circe.syntax._
+case class ProduceRequest(topic: String, value: Json, key: Option[String], headers: Option[Map[String, String]])
 case class ProducerResponse(ok: Boolean)
 
 trait ProduceEndpoint extends algebra.Endpoints
-  with algebra.JsonEntitiesFromSchemas
-  with generic.JsonSchemas {
+  with JsonEntitiesFromCodecs {
 
-  implicit lazy val produceRequestSchema : JsonSchema[ProduceRequest] = genericJsonSchema
-  implicit lazy val produceResponseSchema : JsonSchema[ProducerResponse] = genericJsonSchema
-
-  val produce : Endpoint[ProduceRequest, ProducerResponse] =
+  val produce : Endpoint[Seq[ProduceRequest], ProducerResponse] =
     endpoint(
-      post(path / "produce", jsonRequest[ProduceRequest]),
+      post(path / "produce", jsonRequest[Seq[ProduceRequest]]),
       ok(jsonResponse[ProducerResponse])
     )
 
