@@ -59,10 +59,9 @@ rules_scala_version = "c711b4d1f0d1cc386c63ef748c9df14d2f3a187e"
 
 http_archive(
     name = "io_bazel_rules_scala",
-    sha256 = "556677f505634da64efc41912d280895e61f5da109d82bdee41cde4120a190a1",
-    strip_prefix = "rules_scala-%s" % rules_scala_version,
-    type = "zip",
-    url = "https://github.com/bazelbuild/rules_scala/archive/%s.zip" % rules_scala_version,
+    sha256 = "141a3919b37c80a846796f792dcf6ea7cd6e7b7ca4297603ca961cd22750c951",
+    strip_prefix = "rules_scala-5.0.0",
+    url = "https://github.com/bazelbuild/rules_scala/archive/refs/tags/v5.0.0.tar.gz",
 )
 
 load("@io_bazel_rules_scala//:scala_config.bzl", "scala_config")
