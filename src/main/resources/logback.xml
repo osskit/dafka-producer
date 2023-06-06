@@ -13,11 +13,11 @@
         </encoder>
     </appender>
 
-    <logger name="Main" level="debug" additivity="false">
+    <logger name="org.apache.kafka" level="WARN" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <variable name="ROOT_LOG_LEVEL" value="${ROOT_LOG_LEVEL:-WARN}" />
+    <variable name="ROOT_LOG_LEVEL" value="${ROOT_LOG_LEVEL:-DEBUG}" />
     <root level="${ROOT_LOG_LEVEL}">
         <appender-ref ref="STDOUT" />
     </root>

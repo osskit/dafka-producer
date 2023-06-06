@@ -2,7 +2,6 @@ package config
 import cats.syntax.all._
 import ciris.refined._
 import ciris._
-import com.comcast.ip4s.Port
 import eu.timepit.refined.types.string.NonEmptyString
 
 final case class Config(

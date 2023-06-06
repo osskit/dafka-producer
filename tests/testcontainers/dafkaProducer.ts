@@ -11,15 +11,11 @@ export interface ServiceContainer {
     produce: (payload: any) => Promise<Response>;
 }
 
-export const dafkaProducer = async (
-    network: StartedNetwork,
-    env: Record<string, string>
-): Promise<ServiceContainer> => {
+export const dafkaProducer = async (network: StartedNetwork): Promise<ServiceContainer> => {
     const container = await new GenericContainer('bazel/src:image')
         .withExposedPorts(8080)
         .withNetwork(network)
         .withEnvironment({
-            ...env,
             KAFKA_BROKER: 'kafka:9092',
         })
         .withStartupTimeout(startupTimeout)

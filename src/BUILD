@@ -43,5 +43,5 @@ scala_binary(
 scala_image(
     name = "image",
     main_class = "Main",
-    runtime_deps = [":lib"],
+    runtime_deps = [":main"],
 )

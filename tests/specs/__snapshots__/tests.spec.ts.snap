@@ -17,3 +17,11 @@ exports[`tests produce and consume 2`] = `
   "x-request-id": "123",
 }
 `;
+
+exports[`tests produce and consume 3`] = `
+{
+  "data": "foo",
+}
+`;
+
+exports[`tests produce and consume 4`] = `{}`;

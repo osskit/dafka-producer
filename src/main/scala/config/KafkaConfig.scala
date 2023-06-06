@@ -19,7 +19,7 @@ object SASLMechanism extends StringEnum[SASLMechanism] with StringCirisEnum[SASL
   case object Plain extends SASLMechanism("PLAIN")
   case object Scram extends SASLMechanism("SCRAM-SHA-512")
 
-  val values = findValues
+  val values: IndexedSeq[SASLMechanism] = findValues
 }
 
 final case class SASLConfig(username: NonEmptyString, password: Secret[String], mechanism: SASLMechanism, truststoreFilePath: Option[Path], truststoreFilePassword: Option[Secret[String]])

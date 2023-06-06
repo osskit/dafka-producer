@@ -20,9 +20,9 @@ class ProducerImpl(
 
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
-  val monitor = new Monitor("producer", Seq("topic"))
+  private val monitor = new Monitor("producer", Seq("topic"))
 
-  override def produce(record: ProduceRequest): IO[Unit] = {
+  override def produce(record: ProduceRequest): IO[Unit] =
     monitor.monitor("produce", Seq(record.topic), Map(
       "topic" -> record.topic,
       "message" -> record.value.toString(),
@@ -33,16 +33,15 @@ class ProducerImpl(
         record.topic,
         null,
         new Date().getTime(),
-        record.key.getOrElse(null),
+        record.key.orNull,
         record.value.toString(),
         record.headers.map(headers => headers.map {
           case (key, value) =>
             val header: Header = new RecordHeader(key, value.getBytes)
             header
-        }).map(seq => seq.asJava).getOrElse(null)
+        }).map(seq => seq.asJava).orNull
       )
     )).map(_ => ())
-  }
 
   override def healthy(): IO[Boolean] = {
     readinessTopic.map { topic =>
