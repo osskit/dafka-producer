@@ -90,16 +90,8 @@ rules_proto_dependencies()
 
 rules_proto_toolchains()
 
-load("@io_bazel_rules_scala//scala:toolchains.bzl", "scala_register_toolchains")
+register_toolchains("//toolchains:my_scala_toolchain")
 
-scala_register_toolchains()
-
-# optional: setup ScalaTest toolchain and dependencies
-load("@io_bazel_rules_scala//testing:scalatest.bzl", "scalatest_repositories", "scalatest_toolchain")
-
-scalatest_repositories()
-
-scalatest_toolchain()
 
 # bazel_docker ----------------------------------------------------------------
 

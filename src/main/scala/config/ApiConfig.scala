@@ -1,9 +1,8 @@
 package config
 
-import ciris.{ConfigDecoder, ConfigValue, Effect, env}
 import cats.implicits._
-import com.comcast.ip4s.Port
-import com.comcast.ip4s._
+import ciris.{ConfigDecoder, ConfigValue, Effect, env}
+import com.comcast.ip4s.{Port, _}
 
 case class ApiConfig(port: Port)
 

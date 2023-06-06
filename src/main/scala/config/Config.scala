@@ -1,7 +1,7 @@
 package config
 import cats.syntax.all._
-import ciris.refined._
 import ciris._
+import ciris.refined._
 import eu.timepit.refined.types.string.NonEmptyString
 
 final case class Config(
@@ -14,7 +14,7 @@ object Config {
   def build(): ConfigValue[Effect, Config] =
     (
       default("my-api").as[NonEmptyString],
-      KafkaConfig.apply,
+      KafkaConfig.apply(),
       ApiConfig.apply,
     ).parMapN((name, kafkaConfig, apiConfig) => Config(name, kafkaConfig, apiConfig))
 }

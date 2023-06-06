@@ -2,13 +2,9 @@ package config
 
 import cats.implicits._
 import ciris.refined._
-import ciris.{ConfigDecoder, ConfigValue, Effect, Secret, env, file}
-import com.banno.kafka.BootstrapServers.toConfig
-import com.banno.kafka.KeySerializerClass
+import ciris._
 import enumeratum.values.{StringCirisEnum, StringEnum, StringEnumEntry}
-import enumeratum.{CirisEnum, Enum, EnumEntry}
 import eu.timepit.refined.types.string.NonEmptyString
-import org.apache.kafka.common.serialization.StringSerializer
 
 import java.nio.file.Path
 

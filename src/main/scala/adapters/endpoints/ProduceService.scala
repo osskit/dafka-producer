@@ -5,7 +5,6 @@ import cats.implicits._
 import endpoints4s.http4s.server.{Endpoints, JsonEntitiesFromCodecs}
 import org.http4s.HttpRoutes
 import org.typelevel.log4cats.{LoggerFactory, SelfAwareStructuredLogger}
-import org.typelevel.log4cats.slf4j.Slf4jLogger
 import ports.{Producer, ProducerResponse}
 
 class ProduceService(
