@@ -23,7 +23,7 @@ export const dafkaProducer = async (
             KAFKA_BROKER: 'kafka:9092',
         })
         .withStartupTimeout(startupTimeout)
-        .withWaitStrategy(Wait.forHttp('/metrics', 8080).forStatusCode(200))
+        .withWaitStrategy(Wait.forHttp('/ready', 8080).forStatusCode(200))
 
         .start();
 

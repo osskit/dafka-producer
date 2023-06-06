@@ -1,29 +1,25 @@
+import adapters.endpoints.{MonitoringService, ProduceService}
+import adapters.kafka.ProducerImpl
 import cats.effect._
-import com.banno.kafka.{BootstrapServers, ClientId, KeySerializerClass, SchemaRegistryUrl, TransactionalId, ValueSerializerClass}
-import org.http4s._
-import com.comcast.ip4s._
 import cats.implicits._
-import org.http4s.implicits._
-import org.http4s.ember.server._
-import org.http4s.server.Router
-import endpoints4s.http4s.server.Endpoints
 import com.banno.kafka.producer._
-import org.apache.kafka.clients.producer.ProducerRecord
-import ports.ProducerResponse
+import com.banno.kafka.{BootstrapServers, ClientId, KeySerializerClass, ValueSerializerClass}
+import com.comcast.ip4s._
 import config.Config.build
+import org.apache.kafka.common.serialization.{Serializer, StringSerializer}
+import org.http4s._
+import org.http4s.ember.server._
+import org.http4s.implicits._
 import org.http4s.metrics.MetricsOps
 import org.http4s.metrics.prometheus.{Prometheus, PrometheusExportService}
+import org.http4s.server.Router
 import org.http4s.server.middleware.Metrics
-import adapters.ProduceService
-import org.apache.kafka.common.serialization.StringSerializer
-import org.typelevel.log4cats.Logger
-import org.typelevel.log4cats.slf4j.Slf4jLogger
-import org.apache.kafka.common.serialization.Serializer
-import java.net.InetAddress
+import org.typelevel.log4cats.LoggerFactory
+import org.typelevel.log4cats.slf4j.{Slf4jFactory, Slf4jLogger}
 
 object Main extends IOApp {
-  def httpServer(service: ProduceService, metrics: MetricsOps[IO], metricsRoute: HttpRoutes[IO]) = {
-    val routes = Metrics[IO](metrics)(service.service) <+> metricsRoute
+  def httpServer(apiRoutes: HttpRoutes[IO], metrics: MetricsOps[IO], metricsRoute: HttpRoutes[IO], port: Port) = {
+    val routes = Metrics[IO](metrics)(apiRoutes) <+> metricsRoute
     val httpApp = Router("/" -> routes).orNotFound
     EmberServerBuilder
       .default[IO]
@@ -33,10 +29,8 @@ object Main extends IOApp {
       .build
   }
 
-  val ia: InetAddress = InetAddress.getLocalHost
-  val hostname: String = ia.getHostName
-
   implicit val serializer : Serializer[String] =new StringSerializer()
+  implicit val logging: LoggerFactory[IO] = Slf4jFactory.create[IO]
 
   val resources =
     for {
@@ -44,16 +38,12 @@ object Main extends IOApp {
       metrics <- Prometheus.metricsOps[IO](metricsSvc.collectorRegistry, "dafka_producer")
       config <- build().resource[IO]
       producer <- ProducerApi.resource[IO, String, String](
-        BootstrapServers(config.kafka.broker),
-        ClientId("dafka-producer"),
-        TransactionalId(hostname),
-        KeySerializerClass( classOf[StringSerializer]),
-        ValueSerializerClass( classOf[StringSerializer])
-      ).evalMap(producer =>
-        producer.initTransactions.map(_ => producer)
+        config.kafka.producerConfig: _*,
       )
-      service = new ProduceService(producer)
-      service <- httpServer(service, metrics, metricsSvc.routes)
+      producerImpl = new ProducerImpl(producer, config.kafka.readinessTopic)(metricsSvc.collectorRegistry, logging)
+      produceService = new ProduceService(producerImpl)
+      monitoringService = new MonitoringService(producerImpl)
+      service <- httpServer(produceService.routes <+> monitoringService.routes, metrics, metricsSvc.routes, config.apiConfig.port)
     } yield (service)
 
   def run(args: List[String]): IO[ExitCode] = resources.use(_ =>
