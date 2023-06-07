@@ -47,6 +47,7 @@ object KafkaConfig {
     env("BATCH_SIZE").option
   ).parMapN{
     case (broker, readinessTopic, saslConfig, compressionType, lingerTime, batchSize) => {
+
       val producerConfig = saslConfig.map(sasl => {
         val truststore = sasl.truststoreFilePath zip sasl.truststoreFilePassword
         val kafkaSecurity = sasl.mechanism match {
@@ -57,11 +58,11 @@ object KafkaConfig {
         truststore.map{ case(path, password) =>
           Seq(
             ("ssl.truststore.location", path.toString),
-            ("ssl.truststore.password", password.value)
+            ("ssl.truststore.password", password.value),
+            ("ssl.protocol", "TLS")
           )
         }.getOrElse(Seq()) ++ Seq(
           ("security.protocol", "SASL_SSL"),
-          ("ssl.endpoint.identification.algorithm", ""),
           ("sasl.mechanism", sasl.mechanism.value),
           ("sasl.jaas.config",
             s"org.apache.kafka.common.security.$kafkaSecurity required username=\"${sasl.username}\" password=\"${sasl.password.value}\";"
