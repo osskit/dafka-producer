@@ -2,4 +2,7 @@
 bin
 node_modules
 yarn-error.log
-build
+/bazel-*
+.ijwb
+.idea
+target/
