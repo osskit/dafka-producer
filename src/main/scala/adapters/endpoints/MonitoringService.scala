@@ -11,12 +11,16 @@ class MonitoringService(producer: Producer) extends Endpoints[IO] with Monitorin
   val routes =
     HttpRoutes.of(
       routesFromEndpoints(
-        ready.implementedByEffect(_ => producer.healthy().map(res => res.toString))
+        ready.implementedByEffect(_ => IO.blocking{
+          producer.healthy().map(res => res.toString)
+        })
       )
     ) <+>
     HttpRoutes.of(
       routesFromEndpoints(
-        alive.implementedByEffect(_ => producer.healthy().map(res => res.toString))
+        alive.implementedByEffect(_ => IO.blocking{
+          producer.healthy().map(res => res.toString)
+        })
       )
     )
 

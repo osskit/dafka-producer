@@ -21,11 +21,14 @@ class ProduceService(
       produce.implementedByEffect(records=>
         (for {
           _ <- logger.info("handling produce requests")
-          _ <- records
-            .map(record =>
-              producer.produce(record)
-            )
-            .parSequence
+          // Remove when https://github.com/Banno/kafka4s/pull/516 is merged
+          _ <- IO.blocking{
+            records
+              .map(record =>
+                producer.produce(record)
+              )
+              .parSequence
+          }
           _ <- logger.info("messages produced successfully")
         } yield ProducerResponse(true)).handleErrorWith{throwable =>
           logger.error(throwable)("failed to handle producer request") *> IO.pure(ProducerResponse(false))
