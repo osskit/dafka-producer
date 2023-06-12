@@ -2,17 +2,18 @@ package ports
 
 import endpoints4s.algebra
 
-trait MonitoringEndpoint  extends algebra.Endpoints{
+trait MonitoringEndpoint  extends algebra.Endpoints
+    with algebra.JsonEntitiesFromSchemas{
 
-  val alive : Endpoint[Unit, String] =
+  val alive : Endpoint[Unit, Boolean] =
     endpoint(
       get( path / "alive"),
-      ok(textResponse)
+      ok(jsonResponse[Boolean])
     )
 
-  val ready: Endpoint[Unit, String] =
+  val ready: Endpoint[Unit, Boolean] =
     endpoint(
       get(path / "ready"),
-      ok(textResponse)
+      ok(jsonResponse[Boolean])
     )
 }

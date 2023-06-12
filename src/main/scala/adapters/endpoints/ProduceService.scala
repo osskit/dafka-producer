@@ -22,7 +22,7 @@ class ProduceService(
         (for {
           _ <- logger.info("handling produce requests")
           // Remove when https://github.com/Banno/kafka4s/pull/516 is merged
-          _ <- IO.blocking{
+          _ <- IO.interruptibleMany{
             records
               .map(record =>
                 producer.produce(record)
