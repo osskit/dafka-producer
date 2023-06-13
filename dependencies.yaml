@@ -98,7 +98,7 @@ dependencies:
       version: "2.9.0"
     cats-effect:
       lang: scala
-      version: "3.4.11"
+      version: "3.5.0"
     log4cats:
       lang: scala
       modules: [ "core", "slf4j" ]
