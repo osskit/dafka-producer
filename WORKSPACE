@@ -121,7 +121,16 @@ container_repositories()
 load("@io_bazel_rules_docker//repositories:deps.bzl", container_deps = "deps")
 load("@io_bazel_rules_docker//container:pull.bzl", "container_pull")
 
+load("@io_bazel_rules_docker//container:pull.bzl", container_pull="container_pull")
+
 container_deps()
+
+container_pull(
+    name = "java_base_image",
+    repository = "openjdk",
+    registry = "docker.io",
+    tag = "18"
+)
 
 load(
     "@io_bazel_rules_docker//repositories:repositories.bzl",
