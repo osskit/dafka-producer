@@ -5,7 +5,7 @@ scala_import(
     exports = [
         "//3rdparty/jvm/org/scala_lang:scala_library",
         "//3rdparty/jvm/org/typelevel:cats_core",
-        "//3rdparty/jvm/org/typelevel:cats_effect",
+        "//3rdparty/jvm/org/typelevel:cats_effect_kernel",
         "//3rdparty/jvm/org/typelevel:literally"
     ],
     jars = [
