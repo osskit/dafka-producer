@@ -1,0 +1,20 @@
+name: check-bump
+
+on:
+    pull_request:
+        branches: [main]
+
+concurrency:
+    group: check-bump-${{ github.head_ref }}
+    cancel-in-progress: true
+
+jobs:
+    pr-check-version:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v3
+            - uses: avides/actions-project-version-check@v1.3.0
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  file-to-check: package.json
