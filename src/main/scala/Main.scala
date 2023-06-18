@@ -69,7 +69,7 @@ object Main extends IOApp.Simple {
     val httpApp = Router("/" -> routes).orNotFound
 
     BlazeServerBuilder[IO]
-      .bindHttp(port.value)
+      .bindHttp(port.value, host = "0.0.0.0")
       .withHttpApp(httpApp)
       .resource
   }
