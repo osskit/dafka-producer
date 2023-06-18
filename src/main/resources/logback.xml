@@ -13,6 +13,18 @@
         </encoder>
     </appender>
 
+    <logger name="org.http4s.blaze" level="WARN" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="org.http4s.blazecore" level="WARN" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+     <logger name="org.http4s.blaze.server.BlazeServerBuilder" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
     <logger name="org.apache.kafka" level="WARN" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
