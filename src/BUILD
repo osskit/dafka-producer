@@ -23,8 +23,8 @@ scala_library(
         "@third_party//3rdparty/jvm/org/endpoints4s:http4s_server",
         "@third_party//3rdparty/jvm/org/endpoints4s:json_schema_circe",
         "@third_party//3rdparty/jvm/org/endpoints4s:json_schema_generic",
+        "@third_party//3rdparty/jvm/org/http4s:http4s_blaze_server",
         "@third_party//3rdparty/jvm/org/http4s:http4s_dsl",
-        "@third_party//3rdparty/jvm/org/http4s:http4s_ember_server",
         "@third_party//3rdparty/jvm/org/http4s:http4s_prometheus_metrics",
         "@third_party//3rdparty/jvm/org/slf4j:slf4j_api",
         "@third_party//3rdparty/jvm/org/typelevel:log4cats_core",
@@ -42,7 +42,7 @@ scala_binary(
 
 scala_image(
     name = "image",
-    main_class = "Main",
     base = "@java_base_image//image",
+    main_class = "Main",
     runtime_deps = [":main"],
 )
