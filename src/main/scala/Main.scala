@@ -9,7 +9,7 @@ import com.comcast.ip4s._
 import config.Config.build
 import org.apache.kafka.common.serialization.{Serializer, StringSerializer}
 import org.http4s._
-import org.http4s.ember.server._
+import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.implicits._
 import org.http4s.metrics.prometheus.{Prometheus, PrometheusExportService}
 import org.http4s.server.Router
@@ -67,12 +67,11 @@ object Main extends IOApp.Simple {
 
   private def httpServer(routes: HttpRoutes[IO], port: Port): Resource[IO, server.Server] = {
     val httpApp = Router("/" -> routes).orNotFound
-    EmberServerBuilder
-      .default[IO]
-      .withHost(ipv4"0.0.0.0")
-      .withPort(port)
+
+    BlazeServerBuilder[IO]
+      .bindHttp(port.value)
       .withHttpApp(httpApp)
-      .build
+      .resource
   }
 
   private val resources =

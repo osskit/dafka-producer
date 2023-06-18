@@ -78,9 +78,11 @@ dependencies:
       version: "1.10.0"
 
   org.http4s:
-    http4s:
+    http4s-blaze-server:
       lang: scala
-      modules: [ "dsl", "ember-server" ]
+      version: "0.23.15"
+    http4s-dsl:
+      lang: scala
       version: "0.23.18"
     http4s-prometheus-metrics:
       lang: scala
