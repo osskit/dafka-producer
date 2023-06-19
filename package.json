@@ -1,7 +1,7 @@
 {
     "name": "dafka-producer",
-    "version": "7.1.5",
-    "description": "Dockerized kafka producer ",
+    "version": "7.1.6",
+    "description": "Dockerized kafka producer",
     "private": true,
     "repository": {
         "type": "git",
