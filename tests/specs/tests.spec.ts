@@ -1,4 +1,3 @@
-import {FetchError} from 'node-fetch';
 import type {Orchestrator} from '../testcontainers/orchestrator.js';
 import {start as startKafka} from '../testcontainers/orchestrator.js';
 import {KafkaMessage} from 'kafkajs';
@@ -13,15 +12,6 @@ describe('tests', () => {
     afterAll(async () => {
         await orchestrator.stop();
     }, 1800000);
-
-    const createTopic = async (topics: string[]) => {
-        const admin = orchestrator.kafkaClient.admin();
-
-        await admin.createTopics({
-            topics: topics.map((topic) => ({topic, replicationFactor: 1})),
-            waitForLeaders: true,
-        });
-    };
 
     it.each([
         {
@@ -42,7 +32,6 @@ describe('tests', () => {
         },
     ])('produce and consume', async (message) => {
         const topic = `topic-${Date.now()}`;
-        await createTopic([topic]);
 
         const consumer = orchestrator.kafkaClient.consumer({groupId: 'test'});
         await consumer.connect();
