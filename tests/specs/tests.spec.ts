@@ -1,6 +1,7 @@
+import {FetchError} from 'node-fetch';
 import type {Orchestrator} from '../testcontainers/orchestrator.js';
 import {start as startKafka} from '../testcontainers/orchestrator.js';
-import {Consumer, KafkaMessage} from 'kafkajs';
+import {KafkaMessage} from 'kafkajs';
 
 describe('tests', () => {
     let orchestrator: Orchestrator;
@@ -64,5 +65,18 @@ describe('tests', () => {
         ).toMatchSnapshot();
 
         await consumer.disconnect();
+    });
+
+    it('should throw if failed to produce', async () => {
+        const topic = `topic-${Date.now()}`;
+
+        expect(() =>
+            orchestrator.produce([
+                {
+                    topic,
+                    value: {data: 'foo'},
+                },
+            ])
+        ).rejects.toMatchSnapshot();
     });
 });

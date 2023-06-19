@@ -44,9 +44,10 @@ object KafkaConfig {
     env("USE_SASL_AUTH").flatMap(_ => applySASLConfig()).option,
     env("COMPRESSION_TYPE").default("none"),
     env("LINGER_TIME_MS").default("0"),
-    env("BATCH_SIZE").option
+    env("BATCH_SIZE").option,
+    env("MAX_BLOCK_MS").default("60000")
   ).parMapN{
-    case (broker, readinessTopic, saslConfig, compressionType, lingerTime, batchSize) => {
+    case (broker, readinessTopic, saslConfig, compressionType, lingerTime, batchSize, maxBlockMS) => {
 
       val producerConfig = saslConfig.map(sasl => {
         val truststore = sasl.truststoreFilePath zip sasl.truststoreFilePassword
@@ -74,8 +75,8 @@ object KafkaConfig {
           ("key.serializer", "org.apache.kafka.common.serialization.StringSerializer"),
           ("value.serializer", "org.apache.kafka.common.serialization.StringSerializer"),
           ("bootstrap.servers", broker),
-
-          ("linger.ms", lingerTime)
+          ("linger.ms", lingerTime),
+          ("max.block.ms", maxBlockMS)
         ) ++ batchSize.map(size => Seq(("batch.size", size))).getOrElse(Seq())
 
       KafkaConfig(readinessTopic, producerConfig)

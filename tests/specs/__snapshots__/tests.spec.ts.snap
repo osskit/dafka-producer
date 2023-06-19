@@ -25,3 +25,5 @@ exports[`tests produce and consume 3`] = `
 `;
 
 exports[`tests produce and consume 4`] = `{}`;
+
+exports[`tests should throw if failed to produce 1`] = `[TypeError: fetch failed]`;

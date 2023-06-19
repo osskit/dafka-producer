@@ -27,8 +27,8 @@ class ProduceService(
             )
             .parSequence
           _ <- logger.info("messages produced successfully")
-        } yield ProducerResponse(true)).handleErrorWith{throwable =>
-          logger.error(throwable)("failed to handle producer request") *> IO.pure(ProducerResponse(false))
+        } yield ProducerResponse(true)).onError{throwable =>
+          logger.error(throwable)("failed to handle producer request")
         }
     )
   )
