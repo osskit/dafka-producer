@@ -2,7 +2,7 @@ import {StartedNetwork, Wait} from 'testcontainers';
 import {KafkaContainer} from 'testcontainers';
 import {Kafka, logLevel} from 'kafkajs';
 
-export const kafka = async (network: StartedNetwork) => {
+export const kafka = async (network: StartedNetwork, kafkaConfig?: Record<string, string>) => {
     const container = await new KafkaContainer('confluentinc/cp-kafka:7.2.2')
         .withNetwork(network)
         .withNetworkAliases('kafka')
@@ -18,7 +18,7 @@ export const kafka = async (network: StartedNetwork) => {
             KAFKA_LOG_FLUSH_INTERVAL_MESSAGES: '9223372036854775807',
             KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: '0',
             KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: 'false',
-            KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false',
+            ...kafkaConfig,
         })
         .withWaitStrategy(
             Wait.forLogMessage('Registered broker 1 at path /brokers/ids/1 with addresses: BROKER://kafka:9092')

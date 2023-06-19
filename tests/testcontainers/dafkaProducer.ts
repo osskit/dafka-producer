@@ -17,7 +17,7 @@ export const dafkaProducer = async (network: StartedNetwork): Promise<ServiceCon
         .withNetwork(network)
         .withEnvironment({
             KAFKA_BROKER: 'kafka:9092',
-            MAX_BLOCK_MS: '10',
+            MAX_BLOCK_MS: '1000',
         })
         .withStartupTimeout(startupTimeout)
         .withWaitStrategy(Wait.forHttp('/ready', 8080).forStatusCode(200))

@@ -10,11 +10,11 @@ export interface Orchestrator {
     kafkaClient: Kafka;
 }
 
-export const start = async () => {
+export const start = async (kafkaConfig?: Record<string, string>) => {
     const network = await new Network().start();
 
     const [{client: kafkaClient, stop: stopKafka}, {produce: produce, stop: stopService}] = await Promise.all([
-        kafka(network),
+        kafka(network, kafkaConfig),
         dafkaProducer(network),
     ]);
 

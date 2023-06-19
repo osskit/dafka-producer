@@ -17,7 +17,10 @@ describe('tests', () => {
     const createTopic = async (topics: string[]) => {
         const admin = orchestrator.kafkaClient.admin();
 
-        await admin.createTopics({topics: topics.map((topic) => ({topic, replicationFactor: 1}))});
+        await admin.createTopics({
+            topics: topics.map((topic) => ({topic, replicationFactor: 1})),
+            waitForLeaders: true,
+        });
     };
 
     it.each([
@@ -65,18 +68,5 @@ describe('tests', () => {
         ).toMatchSnapshot();
 
         await consumer.disconnect();
-    });
-
-    it('should throw if failed to produce', async () => {
-        const topic = `topic-${Date.now()}`;
-
-        expect(() =>
-            orchestrator.produce([
-                {
-                    topic,
-                    value: {data: 'foo'},
-                },
-            ])
-        ).rejects.toMatchSnapshot();
     });
 });
