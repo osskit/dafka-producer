@@ -76,7 +76,9 @@ object KafkaConfig {
           ("value.serializer", "org.apache.kafka.common.serialization.StringSerializer"),
           ("bootstrap.servers", broker),
           ("linger.ms", lingerTime),
-          ("max.block.ms", maxBlockMS)
+          ("max.block.ms", maxBlockMS),
+          //todo: add condition here
+          ("partitioner.class", "partitioner.GroupPartitioner")
         ) ++ batchSize.map(size => Seq(("batch.size", size))).getOrElse(Seq())
 
       KafkaConfig(readinessTopic, producerConfig)
