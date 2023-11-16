@@ -45,9 +45,10 @@ object KafkaConfig {
     env("COMPRESSION_TYPE").default("none"),
     env("LINGER_TIME_MS").default("0"),
     env("BATCH_SIZE").option,
-    env("MAX_BLOCK_MS").default("60000")
+    env("MAX_BLOCK_MS").default("60000"),
+    env("USE_GROUP_PARTITIONER").as[Boolean].default(false),
   ).parMapN{
-    case (broker, readinessTopic, saslConfig, compressionType, lingerTime, batchSize, maxBlockMS) => {
+    case (broker, readinessTopic, saslConfig, compressionType, lingerTime, batchSize, maxBlockMS, useGroupPartitioner) => {
 
       val producerConfig = saslConfig.map(sasl => {
         val truststore = sasl.truststoreFilePath zip sasl.truststoreFilePassword
@@ -78,8 +79,9 @@ object KafkaConfig {
           ("linger.ms", lingerTime),
           ("max.block.ms", maxBlockMS),
           //todo: add condition here
-          ("partitioner.class", "partitioner.GroupPartitioner")
+          ("partitioner.class", if (useGroupPartitioner) "partitioner.GroupPartitioner" else "org.apache.kafka.clients.producer.internals.DefaultPartitioner")
         ) ++ batchSize.map(size => Seq(("batch.size", size))).getOrElse(Seq())
+
 
       KafkaConfig(readinessTopic, producerConfig)
     }
