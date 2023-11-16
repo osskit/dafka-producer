@@ -2,6 +2,7 @@ package partitioners
 
 import org.apache.kafka.clients.producer.Partitioner
 import org.apache.kafka.common.Cluster
+import org.apache.kafka.common.utils.Utils
 
 class GroupPartitioner extends Partitioner {
   private val partitionsPerGroup = 5
@@ -10,11 +11,15 @@ class GroupPartitioner extends Partitioner {
   }
 
   override def partition(topic: String, key: Any, keyBytes: Array[Byte], value: Any, valueBytes: Array[Byte], cluster: Cluster): Int = {
-    val parts = key.toString.split("_")
-    val groupKey = parts(0).toInt
-    val withinGroupKey = parts(1).toInt
-
     val numPartitions = cluster.partitionCountForTopic(topic)
+    if (true) {
+      return Math.abs(Utils.murmur2(keyBytes)) % (numPartitions - 1)
+    }
+
+    val parts = key.toString.split("_")
+    val groupKey = parts(0)
+    val withinGroupKey = parts(1)
+
     val numGroups = numPartitions / partitionsPerGroup
 
     val group = Math.abs(groupKey.hashCode % numGroups)
