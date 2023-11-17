@@ -1,30 +1,26 @@
 import {Network} from 'testcontainers';
-import {dafkaProducer} from './dafkaProducer.js';
+import {ServiceClient, dafka} from './dafka.js';
 import {kafka} from './kafka.js';
-
-import {Kafka} from 'kafkajs';
+import { Kafka } from 'kafkajs';
 
 export interface Orchestrator {
-    stop: () => Promise<void>;
-    produce: (payload: any) => Promise<Response>;
     kafkaClient: Kafka;
+    dafkaProducer: ServiceClient
+    stop: () => Promise<void>;
 }
-
-export const start = async (kafkaConfig?: Record<string, string>) => {
+export const start = async (env: Record<string, string>, topics: string[]) => {
     const network = await new Network().start();
 
-    const [{client: kafkaClient, stop: stopKafka}, {produce: produce, stop: stopService}] = await Promise.all([
-        kafka(network, kafkaConfig),
-        dafkaProducer(network),
-    ]);
+    const {client: kafkaClient, stop: stopKafka} = await kafka(network, topics);
+    const {stop: stopDafka, client: dafkaProducer} = await dafka(network, env);
 
     return {
         kafkaClient,
+        dafkaProducer,
         stop: async () => {
-            await stopService();
+            await stopDafka();
             await stopKafka();
             await network.stop();
         },
-        produce,
     };
 };

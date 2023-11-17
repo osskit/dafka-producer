@@ -3,5 +3,5 @@
     "compilerOptions": {
         "module": "ES2020"
     },
-    "include": ["specs", "testcontainers"]
+    "include": ["specs", "testcontainers", "services"]
 }
