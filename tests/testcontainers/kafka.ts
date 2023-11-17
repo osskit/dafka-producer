@@ -17,7 +17,7 @@ export const kafka = async (network: StartedNetwork, topics: string[]) => {
         brokers: [`${container.getHost()}:${container.getMappedPort(9093)}`],
     });
 
-    await client.admin().createTopics({topics: topics.map((topic) => ({topic}))});
+    await client.admin().createTopics({topics: topics.map((topic) => ({topic, numPartitions: 100}))});
 
     return {
         stop: () => container.stop(),

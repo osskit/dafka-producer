@@ -79,7 +79,7 @@ object KafkaConfig {
           ("linger.ms", lingerTime),
           ("max.block.ms", maxBlockMS),
           //todo: add condition here
-          ("partitioner.class", if (useGroupPartitioner) "partitioner.GroupPartitioner" else "org.apache.kafka.clients.producer.internals.DefaultPartitioner")
+          ("partitioner.class", if (useGroupPartitioner) "partitioners.GroupPartitioner" else "org.apache.kafka.clients.producer.internals.DefaultPartitioner")
         ) ++ batchSize.map(size => Seq(("batch.size", size))).getOrElse(Seq())
 
 
