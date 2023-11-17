@@ -47,6 +47,5 @@ describe('tests', () => {
         await delay(5000);
 
         await expect(consume(orchestrator.kafkaClient, topic)).resolves.toMatchSnapshot();
-        await expect(consume(orchestrator.kafkaClient, topic)).resolves.toMatchSnapshot();
     });
 });

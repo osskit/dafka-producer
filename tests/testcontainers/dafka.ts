@@ -11,11 +11,11 @@ export interface ServiceClient {
 
 export const dafka = async (network: StartedNetwork, env: Record<string, string>) => {
     const container = await new GenericContainer('bazel/src:image')
-        .withExposedPorts(3000)
+        .withExposedPorts(8080)
         .withNetwork(network)
         .withEnvironment(env)
-        .withWaitStrategy(Wait.forHttp('/ready', 8080).forStatusCode(200))
         .withStartupTimeout(parseInt(process.env.STARTUP_TIMEOUT ?? '60000'))
+        .withWaitStrategy(Wait.forHttp('/ready', 8080).forStatusCode(200))
         .start();
 
     if (process.env.DEBUG) {
