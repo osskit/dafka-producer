@@ -9,18 +9,15 @@ const topic = 'my-topic';
 describe('tests', () => {
     let orchestrator: Orchestrator;
 
-    beforeEach(
-        async () => {
-            orchestrator = await start(
-                {
-                    KAFKA_BROKER: 'kafka:9092',
-                    MAX_BLOCK_MS: '1000',
-                },
-                [topic]
-            );
-        },
-        5 * 60 * 1000
-    );
+    beforeEach(async () => {
+        orchestrator = await start(
+            {
+                KAFKA_BROKER: 'kafka:9092',
+                MAX_BLOCK_MS: '1000',
+            },
+            [topic]
+        );
+    }, 5 * 60 * 1000);
 
     afterEach(async () => {
         if (!orchestrator) {
@@ -44,8 +41,8 @@ describe('tests', () => {
                     'x-b3-flags': '1',
                     'x-ot-span-context': 'foo',
                 },
-            }
-        ])
+            },
+        ]);
 
         await delay(5000);
 

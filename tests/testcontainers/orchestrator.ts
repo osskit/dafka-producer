@@ -1,11 +1,11 @@
 import {Network} from 'testcontainers';
 import {ServiceClient, dafka} from './dafka.js';
 import {kafka} from './kafka.js';
-import { Kafka } from 'kafkajs';
+import {Kafka} from 'kafkajs';
 
 export interface Orchestrator {
     kafkaClient: Kafka;
-    dafkaProducer: ServiceClient
+    dafkaProducer: ServiceClient;
     stop: () => Promise<void>;
 }
 export const start = async (env: Record<string, string>, topics: string[]) => {

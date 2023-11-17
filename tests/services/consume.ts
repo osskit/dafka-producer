@@ -1,7 +1,7 @@
 import {Kafka, KafkaMessage} from 'kafkajs';
 
 export const consume = async (kafka: Kafka, topic: string, parse = true) => {
-    const consumer = kafka.consumer({groupId: 'orchestrator'});    
+    const consumer = kafka.consumer({groupId: 'orchestrator'});
     await consumer.subscribe({topic: topic, fromBeginning: true});
     const consumedMessage = await new Promise<KafkaMessage>((resolve) => {
         consumer.run({

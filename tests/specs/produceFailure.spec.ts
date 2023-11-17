@@ -8,18 +8,15 @@ const topic = 'my-topic';
 describe('tests', () => {
     let orchestrator: Orchestrator;
 
-    beforeEach(
-        async () => {
-            orchestrator = await start(
-                {
-                    KAFKA_BROKER: 'kafka:9092',
-                    MAX_BLOCK_MS: '1000',
-                },
-                ['my-topic']
-            );
-        },
-        5 * 60 * 1000
-    );
+    beforeEach(async () => {
+        orchestrator = await start(
+            {
+                KAFKA_BROKER: 'kafka:9092',
+                MAX_BLOCK_MS: '1000',
+            },
+            ['my-topic']
+        );
+    }, 5 * 60 * 1000);
 
     afterEach(async () => {
         if (!orchestrator) {
@@ -31,10 +28,10 @@ describe('tests', () => {
     it('produce failure', async () => {
         orchestrator.dafkaProducer.produce([
             {
-                topic: "not exists",
+                topic: 'not exists',
                 value: {data: 'foo'},
-            }
-        ])
+            },
+        ]);
 
         await delay(5000);
 
