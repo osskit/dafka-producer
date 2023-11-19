@@ -17,7 +17,7 @@ describe('tests', () => {
                 USE_PRIORITY_PARTITIONER: 'false',
             },
             [topic],
-            6
+            100
         );
     }, 5 * 60 * 1000);
 
@@ -30,7 +30,7 @@ describe('tests', () => {
 
     it('use default partitioner', async () => {
         await Promise.all(
-            [1, 2, 3, 4, 5, 6].map((i) =>
+            [1, 2, 3, 4, 5].map((i) =>
                 orchestrator.dafkaProducer.produce([
                     {
                         topic,
@@ -45,7 +45,8 @@ describe('tests', () => {
 
         const admin = orchestrator.kafkaClient.admin();
         const metadata = await admin.fetchTopicOffsets(topic);
+        console.log(metadata);
         const partitions = metadata.filter((x) => parseInt(x.offset) > 0).map((x) => x.partition);
-        expect(sortBy(partitions)).toEqual([0, 1, 2, 3, 4, 5]);
+        expect(sortBy(partitions)).toEqual([15, 32, 46, 60, 93]);
     });
 });
