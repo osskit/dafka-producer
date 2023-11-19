@@ -12,9 +12,9 @@ describe('tests', () => {
             {
                 KAFKA_BROKER: 'kafka:9092',
                 MAX_BLOCK_MS: '1000',
-                USE_PRIORITY_PARTITIONERusePriorityPartitioner: 'true',
+                USE_PRIORITY_PARTITIONE: 'true',
             },
-            ['my-topic-1','my-topic-2','my-topic-3'],
+            ['my-topic-1', 'my-topic-2', 'my-topic-3'],
             6
         );
     }, 5 * 60 * 1000);
@@ -30,7 +30,7 @@ describe('tests', () => {
         const admin = orchestrator.kafkaClient.admin();
 
         await Promise.all(
-            ["a", "b"].map((i) =>
+            ['a', 'b'].map((i) =>
                 orchestrator.dafkaProducer.produce([
                     {
                         topic: 'my-topic-1',
@@ -48,7 +48,7 @@ describe('tests', () => {
         ).resolves.toEqual([0, 1]);
 
         await Promise.all(
-            ["a", "b"].map((i) =>
+            ['a', 'b'].map((i) =>
                 orchestrator.dafkaProducer.produce([
                     {
                         topic: 'my-topic-2',
@@ -61,12 +61,12 @@ describe('tests', () => {
         await delay(5000);
         await expect(
             admin
-            .fetchTopicOffsets('my-topic-2')
-            .then((metadata) => sortBy(metadata.filter((x) => parseInt(x.offset) > 0).map((x) => x.partition)))
-        ).resolves.toEqual([2,3]);        
+                .fetchTopicOffsets('my-topic-2')
+                .then((metadata) => sortBy(metadata.filter((x) => parseInt(x.offset) > 0).map((x) => x.partition)))
+        ).resolves.toEqual([2, 3]);
 
         await Promise.all(
-            ["a", "b"].map((i) =>
+            ['a', 'b'].map((i) =>
                 orchestrator.dafkaProducer.produce([
                     {
                         topic: 'my-topic-3',
@@ -79,9 +79,8 @@ describe('tests', () => {
         await delay(5000);
         await expect(
             admin
-            .fetchTopicOffsets('my-topic-3')
-            .then((metadata) => sortBy(metadata.filter((x) => parseInt(x.offset) > 0).map((x) => x.partition)))
+                .fetchTopicOffsets('my-topic-3')
+                .then((metadata) => sortBy(metadata.filter((x) => parseInt(x.offset) > 0).map((x) => x.partition)))
         ).resolves.toEqual([4, 5]);
-
     });
 });
