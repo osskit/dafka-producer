@@ -14,9 +14,10 @@ describe('tests', () => {
             {
                 KAFKA_BROKER: 'kafka:9092',
                 MAX_BLOCK_MS: '1000',
-                USE_GROUP_PARTITIONER: 'false',
+                USE_PRIORITY_PARTITIONER: 'false',
             },
-            [topic]
+            [topic],
+            6
         );
     }, 5 * 60 * 1000);
 
@@ -27,9 +28,9 @@ describe('tests', () => {
         await orchestrator.stop();
     });
 
-    it('produce with custom group partitioning', async () => {
+    it('use default partitioner', async () => {
         await Promise.all(
-            [1, 2, 3, 4, 5].map((i) =>
+            [1, 2, 3, 4, 5, 6].map((i) =>
                 orchestrator.dafkaProducer.produce([
                     {
                         topic,
@@ -45,6 +46,6 @@ describe('tests', () => {
         const admin = orchestrator.kafkaClient.admin();
         const metadata = await admin.fetchTopicOffsets(topic);
         const partitions = metadata.filter((x) => parseInt(x.offset) > 0).map((x) => x.partition);
-        expect(sortBy(partitions)).toEqual([15, 32, 46, 60, 93]);
+        expect(sortBy(partitions)).toEqual([0, 1, 2, 3, 4, 5]);
     });
 });
