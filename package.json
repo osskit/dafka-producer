@@ -1,6 +1,6 @@
 {
     "name": "dafka-producer",
-    "version": "7.2.0",
+    "version": "7.2.1",
     "description": "Dockerized kafka producer",
     "private": true,
     "repository": {
@@ -21,6 +21,7 @@
     },
     "dependencies": {
         "@osskit/wiremock-client": "^4.3.1",
+        "@testcontainers/kafka": "^10.2.2",
         "@types/jest": "^24.0.12",
         "@types/lodash": "^4.14.149",
         "@types/node": "^18.16.3",
