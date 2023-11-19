@@ -2,6 +2,7 @@ package partitioners
 
 import org.apache.kafka.clients.producer.Partitioner
 import org.apache.kafka.common.Cluster
+import ciris.{ConfigDecoder, ConfigValue, Effect, env}
 
 class GroupPartitioner extends Partitioner {
   private val partitionsPerGroup = 5
