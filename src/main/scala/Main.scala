@@ -76,9 +76,9 @@ object Main extends IOApp.Simple {
 
   private val resources =
     for {
-      metricsSvc <- Prometheus.collectorRegistry[IO].map(cr => PrometheusExportService[IO](cr))
-      metrics <- Prometheus.metricsOps[IO](metricsSvc.collectorRegistry, "dafka_producer")
       config <- build().resource[IO]
+      metricsSvc <- if (config.prometheusConfig.enableDefaultMetrics) PrometheusExportService.build[IO] else  Prometheus.collectorRegistry[IO].map(cr => PrometheusExportService[IO](cr))
+      metrics <- Prometheus.metricsOps[IO](metricsSvc.collectorRegistry, "dafka_producer")
       producer <- ProducerApi.resource[IO, String, String](
         config.kafka.producerConfig: _*,
       )

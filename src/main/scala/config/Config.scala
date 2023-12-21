@@ -7,7 +7,8 @@ import eu.timepit.refined.types.string.NonEmptyString
 final case class Config(
                          name: NonEmptyString,
                          kafka: KafkaConfig,
-                       apiConfig: ApiConfig
+                       apiConfig: ApiConfig,
+                         prometheusConfig: PrometheusConfig
                        )
 
 object Config {
@@ -16,6 +17,7 @@ object Config {
       default("my-api").as[NonEmptyString],
       KafkaConfig.apply(),
       ApiConfig.apply,
-    ).parMapN((name, kafkaConfig, apiConfig) => Config(name, kafkaConfig, apiConfig))
+      PrometheusConfig.apply
+    ).parMapN((name, kafkaConfig, apiConfig, prometheusConfig) => Config(name, kafkaConfig, apiConfig, prometheusConfig))
 }
 
