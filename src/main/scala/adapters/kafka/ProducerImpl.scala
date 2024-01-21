@@ -42,6 +42,14 @@ class ProducerImpl(
         }).map(seq => seq.asJava).orNull
       )
     )).map(_ => ())
+      .handleErrorWith(e => {
+        if (e.getMessage =="Cannot execute transactional method because we are in an error state") {
+          logger.error(e)("Unrecoverable Kafka error, aborting")
+          System.exit(-5)
+        }
+
+        return IO.raiseError(e)
+      })
 
   override def healthy(): IO[Boolean] = {
     readinessTopic.map { topic =>
