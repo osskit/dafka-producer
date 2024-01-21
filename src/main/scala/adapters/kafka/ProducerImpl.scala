@@ -48,7 +48,7 @@ class ProducerImpl(
           System.exit(-5)
         }
 
-        return IO.raiseError(e)
+        IO.raiseError(e)
       })
 
   override def healthy(): IO[Boolean] = {
