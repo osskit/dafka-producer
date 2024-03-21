@@ -25,7 +25,7 @@ class ProducerImpl(
   override def produce(record: ProduceRequest): IO[Unit] =
     monitor.monitor("produce", Seq(record.topic), Map(
       "topic" -> record.topic,
-      "partition" -> record.partition.toString(),
+      "partition" -> record.partition.toString,
       "message" -> record.value.toString(),
       "key" -> record.key.getOrElse("undefined")
     ))(()=>
