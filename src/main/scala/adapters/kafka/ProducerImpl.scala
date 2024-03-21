@@ -25,13 +25,14 @@ class ProducerImpl(
   override def produce(record: ProduceRequest): IO[Unit] =
     monitor.monitor("produce", Seq(record.topic), Map(
       "topic" -> record.topic,
+      "partition" -> record.partition,
       "message" -> record.value.toString(),
       "key" -> record.key.getOrElse("undefined")
     ))(()=>
     producer.sendAsync(
       new ProducerRecord(
         record.topic,
-        null,
+        record.partition.orNull,
         new Date().getTime(),
         record.key.orNull,
         record.value.toString(),
