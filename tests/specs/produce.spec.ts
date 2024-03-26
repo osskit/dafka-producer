@@ -46,6 +46,8 @@ describe('tests', () => {
 
         await delay(5000);
 
-        await expect(consume(orchestrator.kafkaClient, topic).then(({partition: __, headers, value}) => ({headers, value}))).resolves.toMatchSnapshot();
+        await expect(
+            consume(orchestrator.kafkaClient, topic).then(({partition: __, headers, value}) => ({headers, value}))
+        ).resolves.toMatchSnapshot();
     });
 });
