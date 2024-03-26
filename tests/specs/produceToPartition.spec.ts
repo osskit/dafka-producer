@@ -26,28 +26,18 @@ describe('tests', () => {
         await orchestrator.stop();
     });
 
-    it('produce', async () => {
+    it('produce to partition', async () => {
         orchestrator.dafkaProducer.produce([
             {
                 topic,
+                partition: 2,
                 key: 'thekey',
                 value: {data: 'foo'},
-                headers: {
-                    'x-request-id': '123',
-                    'x-b3-traceid': '456',
-                    'x-b3-spanid': '789',
-                    'x-b3-parentspanid': '101112',
-                    'x-b3-sampled': '1',
-                    'x-b3-flags': '1',
-                    'x-ot-span-context': 'foo',
-                },
             },
         ]);
 
         await delay(5000);
 
-        await expect(
-            consume(orchestrator.kafkaClient, topic).then(({partition: __, headers, value}) => ({headers, value}))
-        ).resolves.toMatchSnapshot();
+        await expect(consume(orchestrator.kafkaClient, topic)).resolves.toMatchSnapshot();
     });
 });
