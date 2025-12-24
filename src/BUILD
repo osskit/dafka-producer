@@ -41,8 +41,15 @@ scala_binary(
 )
 
 scala_image(
-    name = "image",
-    base = "@java_base_image//image",
+    name = "image_amd64",
+    base = "@java_base_image_amd64//image",
+    main_class = "Main",
+    runtime_deps = [":main"],
+)
+
+scala_image(
+    name = "image_arm64",
+    base = "@java_base_image_arm64//image",
     main_class = "Main",
     runtime_deps = [":main"],
 )

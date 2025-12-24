@@ -11,6 +11,7 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+              
             - name: Install bazelisk
               run: |
                   curl -LO "https://github.com/bazelbuild/bazelisk/releases/download/v1.1.0/bazelisk-linux-amd64"
@@ -28,19 +29,37 @@ jobs:
                       type=semver,pattern={{major}}.{{minor}}.{{patch}}
                       type=semver,pattern={{major}}.{{minor}}
                       type=semver,pattern={{major}}
+                      
             - name: Login to DockerHub
               uses: docker/login-action@v1
               with:
                   username: ${{ secrets.DOCKERHUB_USERNAME }}
                   password: ${{ secrets.DOCKERHUB_TOKEN }}
-            - run: |
-                  bazel build //src:image.tar 
-                  docker load -i bazel-bin/src/image.tar
-              name: Build base image with Bazel
-            - name: Push
+                  
+            - name: Build AMD64 image
+              run: |
+                  bazel build //src:image_amd64.tar 
+                  docker load -i bazel-bin/src/image_amd64.tar
+                  
+            - name: Build ARM64 image
+              run: |
+                  bazel build //src:image_arm64.tar 
+                  docker load -i bazel-bin/src/image_arm64.tar
+                  
+            - name: Push multi-arch images
               run: |
                   for tag in $(jq -r '.tags[]' <<< "$DOCKER_METADATA_OUTPUT_JSON"); do
                     echo "pushing $tag"
-                    docker tag bazel/src:image $tag
-                    docker push $tag
+                    
+                    # Tag and push AMD64
+                    docker tag bazel/src:image_amd64 ${tag}-amd64
+                    docker push ${tag}-amd64
+                    
+                    # Tag and push ARM64
+                    docker tag bazel/src:image_arm64 ${tag}-arm64
+                    docker push ${tag}-arm64
+                    
+                    # Create and push multi-arch manifest
+                    docker manifest create $tag ${tag}-amd64 ${tag}-arm64
+                    docker manifest push $tag
                   done

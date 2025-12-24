@@ -126,10 +126,19 @@ load("@io_bazel_rules_docker//container:pull.bzl", container_pull="container_pul
 container_deps()
 
 container_pull(
-    name = "java_base_image",
+    name = "java_base_image_amd64",
+    architecture = "amd64",
     repository = "openjdk",
     registry = "docker.io",
-    tag = "18"
+    tag = "18",
+)
+
+container_pull(
+    name = "java_base_image_arm64",
+    architecture = "arm64",
+    repository = "openjdk",
+    registry = "docker.io",
+    tag = "18",
 )
 
 load(

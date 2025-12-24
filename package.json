@@ -14,7 +14,7 @@
     },
     "homepage": "https://github.com/osskit/dafka-producer#readme",
     "scripts": {
-        "pretest": "bazel build //src:image.tar && docker load -i bazel-bin/src/image.tar",
+        "pretest": "bazel build //src:image_amd64.tar && docker load -i bazel-bin/src/image_amd64.tar",
         "test": "NODE_OPTIONS=--experimental-vm-modules jest --config tests/jest.config.ts",
         "format": "prettier --write '**/*.{ts,js,json,java}'",
         "logs": "docker-compose -f tests/dafka.yml logs"
