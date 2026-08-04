@@ -1,5 +1,7 @@
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@io_bazel_rules_scala//scala:scala.bzl", "scala_binary", "scala_library", "scala_test")
-load("@io_bazel_rules_docker//scala:image.bzl", "scala_image")
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_tarball")
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 
 scala_library(
     name = "lib",
@@ -40,9 +42,41 @@ scala_binary(
     deps = [":lib"],
 )
 
-scala_image(
+copy_file(
+    name = "app_jar",
+    src = ":main_deploy.jar",
+    out = "dafka-producer.jar",
+)
+
+pkg_tar(
+    name = "app_layer",
+    srcs = [":app_jar"],
+    package_dir = "/app",
+)
+
+oci_image(
     name = "image",
-    base = "@java_base_image//image",
-    main_class = "Main",
-    runtime_deps = [":main"],
+    base = "@java_base_image",
+    entrypoint = [
+        "java",
+        "-cp",
+        "/app/dafka-producer.jar",
+        "Main",
+    ],
+    env = {"JAVA_RUNFILES": "/app"},
+    tars = [":app_layer"],
+)
+
+oci_tarball(
+    name = "image_tarball",
+    image = ":image",
+    repo_tags = ["bazel/src:image"],
+)
+
+# `//src:image.tar` in `bazel-bin/src/` is the contract the release workflow and
+# the `pretest` script rely on; oci_tarball writes to `image_tarball/tarball.tar`.
+copy_file(
+    name = "image_tar",
+    src = ":image_tarball",
+    out = "image.tar",
 )
