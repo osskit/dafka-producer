@@ -40,5 +40,6 @@ jobs:
                   docker pull confluentinc/cp-kafka:7.2.2
                   yarn test
               env:
-                  MAX_RETRIES: 20
-                  STARTUP_TIMEOUT: 60000
+                  MAX_RETRIES: 1
+                  STARTUP_TIMEOUT: 120000
+                  DEBUG: 'testcontainers*'
