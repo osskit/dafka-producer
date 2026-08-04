@@ -26,7 +26,7 @@ class ProducerImpl(
     monitor.monitor("produce", Seq(record.topic), Map(
       "topic" -> record.topic,
       "partition" -> record.partition.toString,
-      "message" -> record.value.toString(),
+      "message" -> record.value.noSpaces,
       "key" -> record.key.getOrElse("undefined")
     ))(()=>
     producer.sendAsync(
@@ -35,7 +35,7 @@ class ProducerImpl(
         record.partition.orNull,
         new Date().getTime(),
         record.key.orNull,
-        record.value.toString(),
+        record.value.noSpaces,
         record.headers.map(headers => headers.map {
           case (key, value) =>
             val header: Header = new RecordHeader(key, value.getBytes)

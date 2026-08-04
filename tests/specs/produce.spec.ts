@@ -48,4 +48,20 @@ describe('tests', () => {
 
         await expect(consume(orchestrator.kafkaClient, topic)).resolves.toMatchSnapshot();
     });
+
+    it('produce compact json', async () => {
+        orchestrator.dafkaProducer.produce([
+            {
+                topic,
+                key: 'thekey',
+                value: {data: 'foo', nested: {bar: 'baz'}},
+            },
+        ]);
+
+        await delay(5000);
+
+        const {value} = await consume(orchestrator.kafkaClient, topic, false);
+
+        expect(value).toBe('{"data":"foo","nested":{"bar":"baz"}}');
+    });
 });
