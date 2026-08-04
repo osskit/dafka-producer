@@ -114,6 +114,7 @@ Container images are configured using parameters passed at runtime.
 | `TRUSTSTORE_PASSWORD` | `required` if `TRUSTORE_FILE_PATH != null` | Truststore's password |
 | `USE_PROMETHEUS` | `false` | Export metrics to Prometheus |
 | `PROMETHEUS_BUCKETS` | `0.003,0.03,0.1,0.3,1.5,10` | A list of Prometheus buckets to use |
+| `KAFKA_PROPERTY_*` | `null` | Any [producer config](https://docs.confluent.io/platform/current/installation/configuration/producer-configs.html), passed as is to the Kafka client. The name is lowercased and underscores become dots, so `KAFKA_PROPERTY_MAX_REQUEST_SIZE=5242880` sets `max.request.size=5242880`. Properties that have a dedicated parameter above (e.g. `LINGER_TIME_MS`) are not overridable this way |
 
 ## License
 MIT License
