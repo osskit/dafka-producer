@@ -7,6 +7,7 @@ import enumeratum.values.{StringCirisEnum, StringEnum, StringEnumEntry}
 import eu.timepit.refined.types.string.NonEmptyString
 
 import java.nio.file.Path
+import java.util.Locale
 
 final case class KafkaConfig(readinessTopic: Option[String], producerConfig: Seq[(String, AnyRef)])
 
@@ -21,6 +22,18 @@ object SASLMechanism extends StringEnum[SASLMechanism] with StringCirisEnum[SASL
 final case class SASLConfig(username: NonEmptyString, password: Secret[String], mechanism: SASLMechanism, truststoreFilePath: Option[Path], truststoreFilePassword: Option[Secret[String]])
 
 object KafkaConfig {
+  private val extraPropertyPrefix = "KAFKA_PROPERTY_"
+
+  // Any KAFKA_PROPERTY_* variable is passed to the Kafka client as a producer property,
+  // e.g. KAFKA_PROPERTY_MAX_REQUEST_SIZE=5242880 becomes max.request.size=5242880
+  private def extraProducerConfig(environment: Map[String, String]): Seq[(String, AnyRef)] =
+    environment.toSeq
+      .collect {
+        case (name, value) if name.startsWith(extraPropertyPrefix) && name.length > extraPropertyPrefix.length =>
+          (name.stripPrefix(extraPropertyPrefix).toLowerCase(Locale.ROOT).replace('_', '.'), value)
+      }
+      .sortBy { case (property, _) => property }
+
   implicit val pathDecoder: ConfigDecoder[String, Path] =
     ConfigDecoder[String, String]
       .map(path => Path.of(path))
@@ -79,7 +92,10 @@ object KafkaConfig {
           ("max.block.ms", maxBlockMS)
         ) ++ batchSize.map(size => Seq(("batch.size", size))).getOrElse(Seq())
 
-      KafkaConfig(readinessTopic, producerConfig)
+      val extraConfig = extraProducerConfig(sys.env)
+        .filterNot { case (property, _) => producerConfig.exists { case (name, _) => name == property } }
+
+      KafkaConfig(readinessTopic, producerConfig ++ extraConfig)
     }
   }
 }
